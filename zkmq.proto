@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package zkmq;
+
+message Record {
+  string topic = 1;
+  string key = 2;
+  bytes content = 3;
+}
+
+message PushResponse { uint64 offset = 1; }
+
+message PullRequest {
+  string consumer = 1;
+  string topic = 2;
+  uint64 offset = 3;
+}
+
+message PullResponse {
+  uint64 offset = 1;
+  Record record = 2;
+}
+
+message CommitRequest {
+  string consumer = 1;
+  uint64 offset = 2;
+}
+
+message CommitRespose { uint64 offset = 2; }
+
+message Topic { string key = 1; }
+
+message OffsetChanged {
+  string topic = 1;
+  string partition = 2;
+  uint64 offset = 3;
+}
+
+service Broker {
+  rpc Push(Record) returns (PushResponse);
+  rpc Pull(PullRequest) returns (PullResponse);
+  rpc Commit(CommitRequest) returns (CommitRespose);
+  rpc Listen(Topic) returns (stream OffsetChanged);
+}

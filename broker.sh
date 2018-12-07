@@ -1,0 +1,1 @@
+go build  -o ./.build/broker ./cmd/broker && ./.build/broker "$@" && rm ./.build/broker

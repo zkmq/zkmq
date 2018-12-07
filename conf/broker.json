@@ -1,0 +1,11 @@
+{
+    "gomesh": {
+        "grpc": {
+            "laddr": ":2019"
+        },
+        "service": {
+            "zkmq.Storage": {},
+            "zkmq.Broker": {}
+        }
+    }
+}
