@@ -26,6 +26,7 @@ type Record struct {
 	Topic                string   `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
 	Key                  string   `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
 	Content              []byte   `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	Offset               uint64   `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -77,6 +78,52 @@ func (m *Record) GetContent() []byte {
 	return nil
 }
 
+func (m *Record) GetOffset() uint64 {
+	if m != nil {
+		return m.Offset
+	}
+	return 0
+}
+
+type BatchPushRequest struct {
+	Record               []*Record `protobuf:"bytes,1,rep,name=record,proto3" json:"record,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
+}
+
+func (m *BatchPushRequest) Reset()         { *m = BatchPushRequest{} }
+func (m *BatchPushRequest) String() string { return proto.CompactTextString(m) }
+func (*BatchPushRequest) ProtoMessage()    {}
+func (*BatchPushRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f92f6a188edddc82, []int{1}
+}
+
+func (m *BatchPushRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_BatchPushRequest.Unmarshal(m, b)
+}
+func (m *BatchPushRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_BatchPushRequest.Marshal(b, m, deterministic)
+}
+func (m *BatchPushRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_BatchPushRequest.Merge(m, src)
+}
+func (m *BatchPushRequest) XXX_Size() int {
+	return xxx_messageInfo_BatchPushRequest.Size(m)
+}
+func (m *BatchPushRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_BatchPushRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_BatchPushRequest proto.InternalMessageInfo
+
+func (m *BatchPushRequest) GetRecord() []*Record {
+	if m != nil {
+		return m.Record
+	}
+	return nil
+}
+
 type PushResponse struct {
 	Offset               uint64   `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -88,7 +135,7 @@ func (m *PushResponse) Reset()         { *m = PushResponse{} }
 func (m *PushResponse) String() string { return proto.CompactTextString(m) }
 func (*PushResponse) ProtoMessage()    {}
 func (*PushResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{1}
+	return fileDescriptor_f92f6a188edddc82, []int{2}
 }
 
 func (m *PushResponse) XXX_Unmarshal(b []byte) error {
@@ -119,7 +166,7 @@ func (m *PushResponse) GetOffset() uint64 {
 type PullRequest struct {
 	Consumer             string   `protobuf:"bytes,1,opt,name=consumer,proto3" json:"consumer,omitempty"`
 	Topic                string   `protobuf:"bytes,2,opt,name=topic,proto3" json:"topic,omitempty"`
-	Offset               uint64   `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
+	Count                uint64   `protobuf:"varint,3,opt,name=count,proto3" json:"count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -129,7 +176,7 @@ func (m *PullRequest) Reset()         { *m = PullRequest{} }
 func (m *PullRequest) String() string { return proto.CompactTextString(m) }
 func (*PullRequest) ProtoMessage()    {}
 func (*PullRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{2}
+	return fileDescriptor_f92f6a188edddc82, []int{3}
 }
 
 func (m *PullRequest) XXX_Unmarshal(b []byte) error {
@@ -164,26 +211,25 @@ func (m *PullRequest) GetTopic() string {
 	return ""
 }
 
-func (m *PullRequest) GetOffset() uint64 {
+func (m *PullRequest) GetCount() uint64 {
 	if m != nil {
-		return m.Offset
+		return m.Count
 	}
 	return 0
 }
 
 type PullResponse struct {
-	Offset               uint64   `protobuf:"varint,1,opt,name=offset,proto3" json:"offset,omitempty"`
-	Record               *Record  `protobuf:"bytes,2,opt,name=record,proto3" json:"record,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
+	Record               []*Record `protobuf:"bytes,1,rep,name=record,proto3" json:"record,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
+	XXX_unrecognized     []byte    `json:"-"`
+	XXX_sizecache        int32     `json:"-"`
 }
 
 func (m *PullResponse) Reset()         { *m = PullResponse{} }
 func (m *PullResponse) String() string { return proto.CompactTextString(m) }
 func (*PullResponse) ProtoMessage()    {}
 func (*PullResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{3}
+	return fileDescriptor_f92f6a188edddc82, []int{4}
 }
 
 func (m *PullResponse) XXX_Unmarshal(b []byte) error {
@@ -204,14 +250,7 @@ func (m *PullResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_PullResponse proto.InternalMessageInfo
 
-func (m *PullResponse) GetOffset() uint64 {
-	if m != nil {
-		return m.Offset
-	}
-	return 0
-}
-
-func (m *PullResponse) GetRecord() *Record {
+func (m *PullResponse) GetRecord() []*Record {
 	if m != nil {
 		return m.Record
 	}
@@ -220,7 +259,8 @@ func (m *PullResponse) GetRecord() *Record {
 
 type CommitRequest struct {
 	Consumer             string   `protobuf:"bytes,1,opt,name=consumer,proto3" json:"consumer,omitempty"`
-	Offset               uint64   `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Topic                string   `protobuf:"bytes,2,opt,name=topic,proto3" json:"topic,omitempty"`
+	Offset               uint64   `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -230,7 +270,7 @@ func (m *CommitRequest) Reset()         { *m = CommitRequest{} }
 func (m *CommitRequest) String() string { return proto.CompactTextString(m) }
 func (*CommitRequest) ProtoMessage()    {}
 func (*CommitRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{4}
+	return fileDescriptor_f92f6a188edddc82, []int{5}
 }
 
 func (m *CommitRequest) XXX_Unmarshal(b []byte) error {
@@ -258,6 +298,13 @@ func (m *CommitRequest) GetConsumer() string {
 	return ""
 }
 
+func (m *CommitRequest) GetTopic() string {
+	if m != nil {
+		return m.Topic
+	}
+	return ""
+}
+
 func (m *CommitRequest) GetOffset() uint64 {
 	if m != nil {
 		return m.Offset
@@ -276,7 +323,7 @@ func (m *CommitRespose) Reset()         { *m = CommitRespose{} }
 func (m *CommitRespose) String() string { return proto.CompactTextString(m) }
 func (*CommitRespose) ProtoMessage()    {}
 func (*CommitRespose) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{5}
+	return fileDescriptor_f92f6a188edddc82, []int{6}
 }
 
 func (m *CommitRespose) XXX_Unmarshal(b []byte) error {
@@ -315,7 +362,7 @@ func (m *Topic) Reset()         { *m = Topic{} }
 func (m *Topic) String() string { return proto.CompactTextString(m) }
 func (*Topic) ProtoMessage()    {}
 func (*Topic) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{6}
+	return fileDescriptor_f92f6a188edddc82, []int{7}
 }
 
 func (m *Topic) XXX_Unmarshal(b []byte) error {
@@ -356,7 +403,7 @@ func (m *OffsetChanged) Reset()         { *m = OffsetChanged{} }
 func (m *OffsetChanged) String() string { return proto.CompactTextString(m) }
 func (*OffsetChanged) ProtoMessage()    {}
 func (*OffsetChanged) Descriptor() ([]byte, []int) {
-	return fileDescriptor_f92f6a188edddc82, []int{7}
+	return fileDescriptor_f92f6a188edddc82, []int{8}
 }
 
 func (m *OffsetChanged) XXX_Unmarshal(b []byte) error {
@@ -400,6 +447,7 @@ func (m *OffsetChanged) GetOffset() uint64 {
 
 func init() {
 	proto.RegisterType((*Record)(nil), "zkmq.Record")
+	proto.RegisterType((*BatchPushRequest)(nil), "zkmq.BatchPushRequest")
 	proto.RegisterType((*PushResponse)(nil), "zkmq.PushResponse")
 	proto.RegisterType((*PullRequest)(nil), "zkmq.PullRequest")
 	proto.RegisterType((*PullResponse)(nil), "zkmq.PullResponse")
@@ -412,29 +460,31 @@ func init() {
 func init() { proto.RegisterFile("zkmq.proto", fileDescriptor_f92f6a188edddc82) }
 
 var fileDescriptor_f92f6a188edddc82 = []byte{
-	// 344 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0x5f, 0x4b, 0xc3, 0x30,
-	0x14, 0xc5, 0xe9, 0xfe, 0x44, 0x77, 0xb7, 0x81, 0x5e, 0x45, 0xea, 0xf0, 0x61, 0x14, 0xd1, 0x3d,
-	0xe8, 0x90, 0xf9, 0x0d, 0xdc, 0x9b, 0x0c, 0x1c, 0x41, 0xf0, 0xc1, 0xa7, 0x59, 0x33, 0x57, 0xd6,
-	0x26, 0x5d, 0x92, 0x3e, 0xe8, 0xd7, 0xf3, 0x8b, 0x49, 0x93, 0x6e, 0x69, 0x84, 0x89, 0x6f, 0xb9,
-	0xb9, 0x87, 0x93, 0xd3, 0xdf, 0x29, 0xc0, 0xd7, 0x3a, 0xdb, 0x8c, 0x73, 0x29, 0xb4, 0xc0, 0x56,
-	0x79, 0x8e, 0x1e, 0x81, 0x50, 0x16, 0x0b, 0xf9, 0x8e, 0xa7, 0xd0, 0xd6, 0x22, 0x4f, 0xe2, 0x30,
-	0x18, 0x06, 0xa3, 0x0e, 0xb5, 0x03, 0x1e, 0x41, 0x73, 0xcd, 0x3e, 0xc3, 0x86, 0xb9, 0x2b, 0x8f,
-	0x18, 0xc2, 0x41, 0x2c, 0xb8, 0x66, 0x5c, 0x87, 0xcd, 0x61, 0x30, 0xea, 0xd1, 0xed, 0x18, 0x5d,
-	0x41, 0x6f, 0x5e, 0xa8, 0x15, 0x65, 0x2a, 0x17, 0x5c, 0x31, 0x3c, 0x03, 0x22, 0x96, 0x4b, 0xc5,
-	0xb4, 0xb1, 0x6c, 0xd1, 0x6a, 0x8a, 0x5e, 0xa0, 0x3b, 0x2f, 0xd2, 0x94, 0xb2, 0x4d, 0xc1, 0x94,
-	0xc6, 0x01, 0x1c, 0xc6, 0x82, 0xab, 0x22, 0x63, 0xb2, 0x7a, 0x7b, 0x37, 0xbb, 0x50, 0x8d, 0x7a,
-	0x28, 0x67, 0xdc, 0xf4, 0x8c, 0x67, 0x65, 0x80, 0xd2, 0xf8, 0xef, 0x00, 0x78, 0x09, 0x44, 0x9a,
-	0x8f, 0x36, 0xb6, 0xdd, 0x49, 0x6f, 0x6c, 0xb8, 0x58, 0x10, 0xb4, 0xda, 0x45, 0x53, 0xe8, 0x4f,
-	0x45, 0x96, 0x25, 0xfa, 0x3f, 0x41, 0xdd, 0x53, 0x0d, 0x2f, 0xd2, 0xb5, 0x33, 0x51, 0xb9, 0xf0,
-	0x32, 0xf9, 0xc2, 0x73, 0x68, 0x3f, 0xd7, 0x89, 0x07, 0x3b, 0xe2, 0xd1, 0x2b, 0xf4, 0x9f, 0x8c,
-	0x68, 0xba, 0x5a, 0xf0, 0x0f, 0xb6, 0xaf, 0xaa, 0x0b, 0xe8, 0xe4, 0x0b, 0xa9, 0x13, 0x9d, 0x08,
-	0x5e, 0xf1, 0x72, 0x17, 0xfb, 0x98, 0x4d, 0xbe, 0x03, 0x20, 0x0f, 0x52, 0xac, 0x99, 0xc4, 0x11,
-	0xb4, 0xca, 0xfe, 0xd0, 0xc3, 0x31, 0x40, 0x3b, 0x79, 0xcd, 0xde, 0x96, 0xca, 0x34, 0xc5, 0xe3,
-	0xed, 0x6e, 0xd7, 0xa6, 0x93, 0xd7, 0x7a, 0x98, 0x00, 0xb1, 0x10, 0xf0, 0xc4, 0x6e, 0x3d, 0xae,
-	0x83, 0x5f, 0x97, 0x96, 0xd3, 0x0d, 0x90, 0x59, 0xa2, 0x34, 0xe3, 0xd8, 0xb5, 0x6b, 0x43, 0x67,
-	0xab, 0xf5, 0x78, 0xdc, 0x05, 0x6f, 0xc4, 0xfc, 0xd3, 0xf7, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0x47, 0x59, 0x01, 0x97, 0xe1, 0x02, 0x00, 0x00,
+	// 383 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0xcf, 0x4b, 0xfb, 0x30,
+	0x14, 0x27, 0x6b, 0xd7, 0xef, 0x77, 0x6f, 0x1b, 0xcc, 0x38, 0x46, 0x1d, 0x1e, 0x4a, 0x11, 0xed,
+	0x41, 0x87, 0x4c, 0x41, 0xcf, 0xdb, 0x55, 0x70, 0x14, 0x3d, 0x88, 0xa7, 0xad, 0x66, 0xae, 0xac,
+	0x4d, 0xba, 0x24, 0x3d, 0xe8, 0xdf, 0xee, 0x41, 0xda, 0xf4, 0x57, 0x86, 0x03, 0xf1, 0xd6, 0x97,
+	0xf7, 0x92, 0xcf, 0xaf, 0x57, 0x80, 0xcf, 0x6d, 0xbc, 0x9b, 0x24, 0x9c, 0x49, 0x86, 0xcd, 0xec,
+	0xdb, 0x5d, 0x81, 0xe5, 0x93, 0x80, 0xf1, 0x37, 0x3c, 0x84, 0xb6, 0x64, 0x49, 0x18, 0xd8, 0xc8,
+	0x41, 0x5e, 0xc7, 0x57, 0x05, 0x1e, 0x80, 0xb1, 0x25, 0x1f, 0x76, 0x2b, 0x3f, 0xcb, 0x3e, 0xb1,
+	0x0d, 0xff, 0x02, 0x46, 0x25, 0xa1, 0xd2, 0x36, 0x1c, 0xe4, 0xf5, 0xfc, 0xb2, 0xc4, 0x23, 0xb0,
+	0xd8, 0x7a, 0x2d, 0x88, 0xb4, 0x4d, 0x07, 0x79, 0xa6, 0x5f, 0x54, 0xee, 0x3d, 0x0c, 0x66, 0x4b,
+	0x19, 0x6c, 0x16, 0xa9, 0xd8, 0xf8, 0x64, 0x97, 0x12, 0x21, 0xf1, 0x19, 0x58, 0x3c, 0xc7, 0xb5,
+	0x91, 0x63, 0x78, 0xdd, 0x69, 0x6f, 0x92, 0x53, 0x53, 0x5c, 0xfc, 0xa2, 0xe7, 0x9e, 0x43, 0x4f,
+	0x5d, 0x12, 0x09, 0xa3, 0x82, 0x34, 0x10, 0x90, 0x86, 0xf0, 0x0c, 0xdd, 0x45, 0x1a, 0x45, 0xe5,
+	0xe3, 0x63, 0xf8, 0x1f, 0x30, 0x2a, 0xd2, 0x98, 0xf0, 0x42, 0x4d, 0x55, 0xd7, 0x32, 0x5b, 0x4d,
+	0x99, 0x43, 0x68, 0x07, 0x2c, 0x2d, 0x24, 0x99, 0xbe, 0x2a, 0xdc, 0xdb, 0x0c, 0x3e, 0x7b, 0xb6,
+	0x80, 0xff, 0x1d, 0xe9, 0x17, 0xe8, 0xcf, 0x59, 0x1c, 0x87, 0xf2, 0xef, 0x74, 0x6a, 0x9d, 0x86,
+	0xa6, 0xf3, 0xa2, 0x7e, 0x5a, 0x24, 0x4c, 0x33, 0xa4, 0xa5, 0x0d, 0x9e, 0x40, 0xfb, 0xa9, 0x99,
+	0x1f, 0xaa, 0xf2, 0x73, 0x5f, 0xa1, 0xff, 0x98, 0x0f, 0xcd, 0x37, 0x4b, 0xfa, 0x4e, 0x0e, 0x05,
+	0x7f, 0x0a, 0x9d, 0x64, 0xc9, 0x65, 0x28, 0x43, 0x46, 0x0b, 0x72, 0xf5, 0xc1, 0x21, 0x82, 0xd3,
+	0x2f, 0x04, 0xd6, 0x8c, 0xb3, 0x2d, 0xe1, 0xd8, 0x03, 0x33, 0xcb, 0x0e, 0x6b, 0x26, 0x8d, 0xb1,
+	0xaa, 0xb4, 0x54, 0xef, 0xa0, 0x53, 0xed, 0x07, 0x1e, 0xa9, 0x81, 0xfd, 0x85, 0xf9, 0xf1, 0xe2,
+	0x55, 0x06, 0x11, 0x45, 0xf8, 0xa8, 0xec, 0x55, 0x2b, 0x50, 0x8f, 0x37, 0xe2, 0x9b, 0x82, 0xa5,
+	0xdc, 0xc3, 0xc7, 0xaa, 0xab, 0xc5, 0x34, 0xde, 0x3b, 0x54, 0x06, 0x5f, 0x82, 0xf5, 0x10, 0x0a,
+	0x49, 0x28, 0xee, 0xaa, 0x76, 0x6e, 0x6b, 0x39, 0xab, 0x19, 0x79, 0x8d, 0x56, 0x56, 0xfe, 0x6b,
+	0xdd, 0x7c, 0x07, 0x00, 0x00, 0xff, 0xff, 0x38, 0x2b, 0x0a, 0xb3, 0x68, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -450,6 +500,7 @@ const _ = grpc.SupportPackageIsVersion4
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type BrokerClient interface {
 	Push(ctx context.Context, in *Record, opts ...grpc.CallOption) (*PushResponse, error)
+	BatchPush(ctx context.Context, in *BatchPushRequest, opts ...grpc.CallOption) (*PushResponse, error)
 	Pull(ctx context.Context, in *PullRequest, opts ...grpc.CallOption) (*PullResponse, error)
 	Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitRespose, error)
 	Listen(ctx context.Context, in *Topic, opts ...grpc.CallOption) (Broker_ListenClient, error)
@@ -466,6 +517,15 @@ func NewBrokerClient(cc *grpc.ClientConn) BrokerClient {
 func (c *brokerClient) Push(ctx context.Context, in *Record, opts ...grpc.CallOption) (*PushResponse, error) {
 	out := new(PushResponse)
 	err := c.cc.Invoke(ctx, "/zkmq.Broker/Push", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *brokerClient) BatchPush(ctx context.Context, in *BatchPushRequest, opts ...grpc.CallOption) (*PushResponse, error) {
+	out := new(PushResponse)
+	err := c.cc.Invoke(ctx, "/zkmq.Broker/BatchPush", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -525,6 +585,7 @@ func (x *brokerListenClient) Recv() (*OffsetChanged, error) {
 // BrokerServer is the server API for Broker service.
 type BrokerServer interface {
 	Push(context.Context, *Record) (*PushResponse, error)
+	BatchPush(context.Context, *BatchPushRequest) (*PushResponse, error)
 	Pull(context.Context, *PullRequest) (*PullResponse, error)
 	Commit(context.Context, *CommitRequest) (*CommitRespose, error)
 	Listen(*Topic, Broker_ListenServer) error
@@ -548,6 +609,24 @@ func _Broker_Push_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(BrokerServer).Push(ctx, req.(*Record))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Broker_BatchPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchPushRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BrokerServer).BatchPush(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/zkmq.Broker/BatchPush",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BrokerServer).BatchPush(ctx, req.(*BatchPushRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -616,6 +695,10 @@ var _Broker_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Push",
 			Handler:    _Broker_Push_Handler,
+		},
+		{
+			MethodName: "BatchPush",
+			Handler:    _Broker_BatchPush_Handler,
 		},
 		{
 			MethodName: "Pull",

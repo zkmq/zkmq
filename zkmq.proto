@@ -6,24 +6,25 @@ message Record {
   string topic = 1;
   string key = 2;
   bytes content = 3;
+  uint64 offset = 4;
 }
+
+message BatchPushRequest { repeated Record record = 1; }
 
 message PushResponse { uint64 offset = 1; }
 
 message PullRequest {
   string consumer = 1;
   string topic = 2;
-  uint64 offset = 3;
+  uint64 count = 3;
 }
 
-message PullResponse {
-  uint64 offset = 1;
-  Record record = 2;
-}
+message PullResponse { repeated Record record = 1; }
 
 message CommitRequest {
   string consumer = 1;
-  uint64 offset = 2;
+  string topic = 2;
+  uint64 offset = 3;
 }
 
 message CommitRespose { uint64 offset = 2; }
@@ -38,6 +39,7 @@ message OffsetChanged {
 
 service Broker {
   rpc Push(Record) returns (PushResponse);
+  rpc BatchPush(BatchPushRequest) returns (PushResponse);
   rpc Pull(PullRequest) returns (PullResponse);
   rpc Commit(CommitRequest) returns (CommitRespose);
   rpc Listen(Topic) returns (stream OffsetChanged);

@@ -22,9 +22,9 @@ func (storage *storageLevelDB) Offset(topic string) uint64 {
 func (storage *storageLevelDB) ConsumerOffset(topic string, consumer string) uint64 {
 	return 0
 }
-func (storage *storageLevelDB) CommitOffset(topic, consumer string, offset uint64) uint64 {
-	return 0
+func (storage *storageLevelDB) CommitOffset(topic, consumer string, offset uint64) (uint64, error) {
+	return 0, nil
 }
-func (storage *storageLevelDB) Read(topic string, offset uint64, number uint64) ([]*zkmq.Record, error) {
+func (storage *storageLevelDB) Read(topic string, consumer string, number uint64) ([]*zkmq.Record, error) {
 	return nil, nil
 }
