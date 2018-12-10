@@ -19,7 +19,7 @@ type producerImpl struct {
 }
 
 // NewProducer .
-func NewProducer(config config.Config) (mq.Producer, error) {
+func NewProducer(config config.Config) (Producer, error) {
 	conn, err := grpc.Dial(config.Get("remote").String("127.0.0.1:2018"), grpc.WithInsecure())
 
 	if err != nil {

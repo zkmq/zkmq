@@ -32,7 +32,7 @@ type consumerImpl struct {
 }
 
 // NewConsumer .
-func NewConsumer(config config.Config) (mq.Consumer, error) {
+func NewConsumer(config config.Config) (Consumer, error) {
 
 	conn, err := grpc.Dial(config.Get("remote").String("127.0.0.1:2018"), grpc.WithInsecure())
 
