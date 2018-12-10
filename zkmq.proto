@@ -4,7 +4,7 @@ package zkmq;
 
 message Record {
   string topic = 1;
-  string key = 2;
+  bytes key = 2;
   bytes content = 3;
   uint64 offset = 4;
 }

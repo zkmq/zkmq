@@ -2,6 +2,7 @@ package client
 
 import (
 	"github.com/dynamicgo/mq"
+	"github.com/zkmq/zkmq"
 )
 
 // Consumer .
@@ -19,4 +20,8 @@ type Producer interface {
 	Record(key []byte, value []byte) (mq.Record, error)
 	Send(record mq.Record) error
 	Batch(record []mq.Record) error
+}
+
+type recordWrapper struct {
+	*zkmq.Record
 }
