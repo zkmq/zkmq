@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/dynamicgo/xerrors"
+	"google.golang.org/grpc"
 
 	"github.com/dynamicgo/slf4go"
 
@@ -128,4 +129,10 @@ func (broker *brokerImpl) doNotifyConsumer(topic string, offset uint64) []zkmq.B
 	}
 
 	return remained
+}
+
+func (broker *brokerImpl) GrpcHandle(server *grpc.Server) error {
+	zkmq.RegisterBrokerServer(server, broker)
+	broker.InfoF("register grpc service for zkmq.Brokder")
+	return nil
 }
