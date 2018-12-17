@@ -2,6 +2,7 @@ package test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/zkmq/zkmq/services/metadata"
 
@@ -81,5 +82,11 @@ func TestPushMessage(t *testing.T) {
 
 	require.NoError(t, err)
 
-	<-consumer.Recv()
+	r := <-consumer.Recv()
+
+	err = consumer.Commit(r)
+
+	require.NoError(t, err)
+
+	time.Sleep(time.Second * 1)
 }

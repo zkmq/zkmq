@@ -62,6 +62,8 @@ func (producer *producerImpl) Send(record mq.Record) error {
 
 	r := record.(*recordWrapper).Record
 
+	r.Topic = producer.topicID
+
 	_, err := producer.client.Push(context.TODO(), r)
 
 	if err != nil {

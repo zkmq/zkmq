@@ -109,7 +109,7 @@ func (consumer *consumerImpl) pullOne() *recordWrapper {
 	for {
 		select {
 		case <-action.Do():
-			consumer.DebugF("consumer %s pull %s record %s", consumer.consumerID, consumer.topicID, record.GetOffset())
+			consumer.DebugF("consumer(%s) pull topic(%s) record(%d)", consumer.consumerID, consumer.topicID, record.GetOffset())
 			return record
 		case err := <-action.Error():
 			consumer.errors <- err

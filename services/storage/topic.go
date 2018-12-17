@@ -27,7 +27,7 @@ func (storage *storageLevelDB) newTopic(name string) (*topicStorage, error) {
 
 	dbpath := filepath.Join(storage.rootpath, "storage", name)
 
-	storage.DebugF("open topic %s storage path %s", name, dbpath)
+	storage.DebugF("open topic(%s) storage path %s", name, dbpath)
 
 	db, err := leveldb.OpenFile(dbpath, nil)
 
@@ -80,11 +80,17 @@ func (topic *topicStorage) getKeyByOffset(offset uint64) []byte {
 
 func (topic *topicStorage) writeRecord(offset uint64, record *zkmq.Record) (uint64, error) {
 
+	topic.DebugF("write topic(%s) record(%d)", topic.topic, offset)
+
 	offset, err := topic.getOffset(offset)
 
 	if err != nil {
 		return 0, err
 	}
+
+	topic.DebugF("write topic(%s) real record(%d)", topic.topic, offset)
+
+	record.Offset = offset
 
 	buff, err := json.Marshal(record)
 
@@ -106,9 +112,13 @@ func (topic *topicStorage) readRecord(offset, count uint64) ([]*zkmq.Record, err
 	var records []*zkmq.Record
 
 	for i := uint64(0); i < count; i++ {
+
+		topic.DebugF("topic %s read %d", topic.topic, offset+i)
+
 		record, err := topic.readOne(offset + i)
 
 		if err == leveldb.ErrNotFound {
+			topic.DebugF("topic %s read %d -- not found", topic.topic, offset+i)
 			break
 		}
 
@@ -118,6 +128,8 @@ func (topic *topicStorage) readRecord(offset, count uint64) ([]*zkmq.Record, err
 
 		records = append(records, record)
 	}
+
+	topic.DebugF("topic(%s) read record(%d,%d)", topic.topic, len(records), count)
 
 	return records, nil
 }

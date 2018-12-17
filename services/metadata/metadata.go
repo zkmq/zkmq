@@ -56,6 +56,10 @@ func (metadata *metadataSqlite) ConsumerOffset(topic string, consumer string) (u
 		return 0, nil
 	}
 
+	if err != nil {
+		return 0, xerrors.Wrapf(err, "topic(%s) consumer(%s) read metadata error", topic, consumer)
+	}
+
 	offset := metadata.BytesToOffset(buff)
 
 	return offset, nil
@@ -68,6 +72,28 @@ func (metadata *metadataSqlite) CommitOffset(topic, consumer string, offset uint
 	if err != nil {
 		return 0, xerrors.Wrapf(err, "consumer %s open topic %s metadata error", consumer, topic)
 	}
+
+	buff, err := trans.Get([]byte(topic+consumer), nil)
+
+	originOffset := uint64(0)
+
+	if err != nil {
+		if err != leveldb.ErrNotFound {
+			return 0, xerrors.Wrapf(err, "open topic %s metadata error", topic)
+		}
+
+		originOffset = 0
+	} else {
+		originOffset = metadata.BytesToOffset(buff)
+	}
+
+	if originOffset >= offset {
+		metadata.WarnF("consumer(%s) topic(%s) discard commit offset %d, current is %d", consumer, topic, offset, originOffset)
+		trans.Discard()
+		return offset, nil
+	}
+
+	metadata.DebugF("consumer(%s) topic(%s) commit offset %d", consumer, topic, offset)
 
 	err = trans.Put([]byte(topic+consumer), metadata.OffsetToBytes(offset), nil)
 
@@ -88,6 +114,25 @@ func (metadata *metadataSqlite) CommitTopicHeader(topic string, offset uint64) (
 
 	if err != nil {
 		return 0, xerrors.Wrapf(err, "open topic %s metadata error", topic)
+	}
+
+	buff, err := trans.Get([]byte(topic), nil)
+
+	originOffset := uint64(0)
+
+	if err != nil {
+		if err != leveldb.ErrNotFound {
+			return 0, xerrors.Wrapf(err, "open topic %s metadata error", topic)
+		}
+
+		originOffset = 0
+	} else {
+		originOffset = metadata.BytesToOffset(buff)
+	}
+
+	if originOffset >= offset {
+		trans.Discard()
+		return offset, nil
 	}
 
 	err = trans.Put([]byte(topic), metadata.OffsetToBytes(offset), nil)

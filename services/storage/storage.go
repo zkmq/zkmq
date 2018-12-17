@@ -74,7 +74,7 @@ func (storage *storageLevelDB) Write(record *zkmq.Record) (uint64, error) {
 		return 0, err
 	}
 
-	_, err = storage.Metadata.CommitTopicHeader(record.Topic, offset)
+	_, err = storage.Metadata.CommitTopicHeader(record.Topic, offset+1)
 
 	return offset, err
 }
@@ -102,7 +102,8 @@ func (storage *storageLevelDB) ConsumerOffset(topic string, consumer string) uin
 }
 
 func (storage *storageLevelDB) CommitOffset(topic, consumer string, offset uint64) (uint64, error) {
-	return storage.Metadata.CommitOffset(topic, consumer, offset)
+	storage.DebugF("commit consumer(%s) topic(%s) offset %d", consumer, topic, offset+1)
+	return storage.Metadata.CommitOffset(topic, consumer, offset+1)
 }
 
 func (storage *storageLevelDB) Read(topic string, consumer string, number uint64) ([]*zkmq.Record, error) {
@@ -118,6 +119,8 @@ func (storage *storageLevelDB) Read(topic string, consumer string, number uint64
 	if err != nil {
 		return nil, err
 	}
+
+	storage.DebugF("consumer(%s) topic(%s) read record %d with offset %d ", topic, consumer, number, offset)
 
 	return topicStorage.readRecord(offset, number)
 }
