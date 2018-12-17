@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/dynamicgo/go-config"
+	config "github.com/dynamicgo/go-config"
 	"github.com/dynamicgo/mq"
 	"github.com/dynamicgo/retry"
 	"github.com/dynamicgo/slf4go"
@@ -93,6 +93,10 @@ func (consumer *consumerImpl) pullOne() *recordWrapper {
 
 		if err != nil {
 			return err
+		}
+
+		if len(records) == 0 {
+			return xerrors.New("empty consumer queue")
 		}
 
 		record = &recordWrapper{

@@ -3,6 +3,8 @@ package test
 import (
 	"testing"
 
+	"github.com/zkmq/zkmq/services/metadata"
+
 	"github.com/dynamicgo/go-config/source/memory"
 
 	"github.com/stretchr/testify/require"
@@ -29,6 +31,10 @@ func init() {
 		return storage.New(config)
 	})
 
+	gomesh.LocalService("zkmq.Metadata", func(config config.Config) (gomesh.Service, error) {
+		return metadata.New(config)
+	})
+
 	config := config.NewConfig()
 
 	err := config.Load(file.NewSource(file.WithPath("../conf/broker.json")))
@@ -50,6 +56,7 @@ func TestPushMessage(t *testing.T) {
 	{
 		"topic":"test",
 		"producer":"hello",
+		"consumer":"wolrd",
 		"remote":"127.0.0.1:2019"
 	}
 	`))))
@@ -69,4 +76,10 @@ func TestPushMessage(t *testing.T) {
 	err = producer.Send(record)
 
 	require.NoError(t, err)
+
+	consumer, err := client.NewConsumer(conf)
+
+	require.NoError(t, err)
+
+	<-consumer.Recv()
 }
