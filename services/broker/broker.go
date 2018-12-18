@@ -51,6 +51,8 @@ func (broker *brokerImpl) Push(ctx context.Context, record *zkmq.Record) (*zkmq.
 		return nil, xerrors.Wrapf(err, "record(%s) write to storage err", record.GetKey())
 	}
 
+	broker.DebugF("topic(%s) push record(%d) -- success", record.Topic, offset)
+
 	broker.notifyConsumer(record.Topic, offset)
 
 	return &zkmq.PushResponse{

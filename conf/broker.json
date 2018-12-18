@@ -1,7 +1,7 @@
 {
     "slf4go": {
         "default": {
-            "backend": "null"
+            "backend": "console"
         }
     },
     "gomesh": {
@@ -9,7 +9,12 @@
             "laddr": ":2019"
         },
         "service": {
-            "zkmq.Storage": {},
+            "zkmq.Storage": {
+                "path": "./storage"
+            },
+            "zkmq.Metadata": {
+                "path": "./storage"
+            },
             "zkmq.Broker": {}
         }
     }

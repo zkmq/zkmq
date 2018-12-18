@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"sync"
 
+	"github.com/syndtr/goleveldb/leveldb/opt"
+
 	"github.com/dynamicgo/slf4go"
 
 	"github.com/dynamicgo/xerrors"
@@ -98,11 +100,13 @@ func (topic *topicStorage) writeRecord(offset uint64, record *zkmq.Record) (uint
 		return 0, xerrors.Wrapf(err, "marshal record %s error", hex.EncodeToString(record.Key))
 	}
 
-	err = topic.db.Put(topic.getKeyByOffset(offset), buff, nil)
+	err = topic.db.Put(topic.getKeyByOffset(offset), buff, &opt.WriteOptions{Sync: true})
 
 	if err != nil {
 		return 0, xerrors.Wrapf(err, "invoke topic %s leveldb put error", topic.topic)
 	}
+
+	topic.DebugF("write topic(%s) real record(%d) -- success", topic.topic, offset)
 
 	return offset, nil
 }
@@ -150,6 +154,8 @@ func (topic *topicStorage) readOne(offset uint64) (*zkmq.Record, error) {
 	if err := json.Unmarshal(buff, &record); err != nil {
 		return nil, xerrors.Wrapf(err, "unmarshal topic %s record %s error", topic.topic, string(buff))
 	}
+
+	topic.DebugF("topic(%s) read offset %d with real offset %d", topic.topic, offset, record.Offset)
 
 	return record, nil
 }

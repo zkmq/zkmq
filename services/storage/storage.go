@@ -56,6 +56,7 @@ func (storage *storageLevelDB) getTopic(name string) (*topicStorage, error) {
 }
 
 func (storage *storageLevelDB) Write(record *zkmq.Record) (uint64, error) {
+
 	topic, err := storage.getTopic(record.Topic)
 
 	if err != nil {
@@ -120,7 +121,7 @@ func (storage *storageLevelDB) Read(topic string, consumer string, number uint64
 		return nil, err
 	}
 
-	storage.DebugF("consumer(%s) topic(%s) read record %d with offset %d ", topic, consumer, number, offset)
+	storage.DebugF("consumer(%s) topic(%s) read record from %d to %d", topic, consumer, offset, offset+number)
 
 	return topicStorage.readRecord(offset, number)
 }
