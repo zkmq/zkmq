@@ -87,13 +87,19 @@ func (broker *brokerImpl) Commit(ctx context.Context, req *zkmq.CommitRequest) (
 	}, nil
 }
 
-func (broker *brokerImpl) Listen(topic *zkmq.Topic, listener zkmq.Broker_ListenServer) error {
+func (broker *brokerImpl) addListener(topic *zkmq.Topic, listener zkmq.Broker_ListenServer) {
 	broker.Lock()
 	defer broker.Unlock()
 
+	broker.listener[topic.GetKey()] = append(broker.listener[topic.Key], listener)
+}
+
+func (broker *brokerImpl) Listen(topic *zkmq.Topic, listener zkmq.Broker_ListenServer) error {
 	broker.DebugF("append %s listener %p", topic.Key, listener)
 
-	broker.listener[topic.GetKey()] = append(broker.listener[topic.Key], listener)
+	broker.addListener(topic, listener)
+
+	<-listener.Context().Done()
 
 	return nil
 }
