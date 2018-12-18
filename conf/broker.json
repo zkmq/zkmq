@@ -1,4 +1,9 @@
 {
+    "slf4go": {
+        "default": {
+            "backend": "null"
+        }
+    },
     "gomesh": {
         "grpc": {
             "laddr": ":2019"

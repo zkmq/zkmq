@@ -4,6 +4,8 @@ import (
 	"testing"
 	"time"
 
+	extend "github.com/dynamicgo/go-config-extend"
+
 	"github.com/zkmq/zkmq/services/metadata"
 
 	"github.com/dynamicgo/go-config/source/memory"
@@ -44,13 +46,27 @@ func init() {
 		panic(err)
 	}
 
+	subconf, err := extend.SubConfig(config, "slf4go")
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err := slf4go.Load(subconf); err != nil {
+		panic(err)
+	}
+
 	if err := gomesh.Start(config); err != nil {
 		panic(err)
 	}
+
+	createConsumerProducer()
 }
 
-func TestPushMessage(t *testing.T) {
+var consumer client.Consumer
+var producer client.Producer
 
+func createConsumerProducer() {
 	conf := config.NewConfig()
 
 	err := conf.Load(memory.NewSource(memory.WithData([]byte(`
@@ -58,27 +74,37 @@ func TestPushMessage(t *testing.T) {
 		"topic":"test",
 		"producer":"hello",
 		"consumer":"wolrd",
-		"remote":"127.0.0.1:2019"
+		"remote":"127.0.0.1:2019",
+		"default":{
+			"backend":"null"
+		}
 	}
 	`))))
 
-	require.NoError(t, err)
+	if err != nil {
+		panic(err)
+	}
 
-	println(conf.Get("topic").String("`"))
+	producer, err = client.NewProducer(conf)
 
-	producer, err := client.NewProducer(conf)
+	if err != nil {
+		panic(err)
+	}
 
-	require.NoError(t, err)
+	consumer, err = client.NewConsumer(conf)
+
+	if err != nil {
+		panic(err)
+	}
+}
+
+func TestPushMessage(t *testing.T) {
 
 	record, err := producer.Record([]byte("test"), []byte("hello world"))
 
 	require.NoError(t, err)
 
 	err = producer.Send(record)
-
-	require.NoError(t, err)
-
-	consumer, err := client.NewConsumer(conf)
 
 	require.NoError(t, err)
 
@@ -89,4 +115,22 @@ func TestPushMessage(t *testing.T) {
 	require.NoError(t, err)
 
 	time.Sleep(time.Second * 1)
+}
+
+func BenchmarkProducer(t *testing.B) {
+	for i := 0; i < t.N; i++ {
+		record, err := producer.Record([]byte("test"), []byte("hello world"))
+
+		require.NoError(t, err)
+
+		err = producer.Send(record)
+
+		require.NoError(t, err)
+
+		r := <-consumer.Recv()
+
+		err = consumer.Commit(r)
+
+		require.NoError(t, err)
+	}
 }

@@ -54,18 +54,18 @@ func NewConsumer(config config.Config) (Consumer, error) {
 		return nil, xerrors.Errorf("must set consumer")
 	}
 
-	listener, err := client.Listen(context.TODO(), &zkmq.Topic{
-		Key: topic,
-	})
+	// listener, err := client.Listen(context.TODO(), &zkmq.Topic{
+	// 	Key: topic,
+	// })
 
 	if err != nil {
 		return nil, xerrors.Wrapf(err, "topic listener error")
 	}
 
 	consumer := &consumerImpl{
-		Logger:     slf4go.Get("zkmq-consumer"),
-		client:     client,
-		listener:   listener,
+		Logger: slf4go.Get("zkmq-consumer"),
+		client: client,
+		// listener:   listener,
 		cacher:     make(chan mq.Record, config.Get("cached").Int(1)),
 		errors:     make(chan error, 10),
 		consumerID: consumerID,
@@ -78,6 +78,8 @@ func NewConsumer(config config.Config) (Consumer, error) {
 }
 
 func (consumer *consumerImpl) pullLoop() {
+
+	// consumer.listener.Recv()
 
 	for {
 		consumer.cacher <- consumer.pullOne()

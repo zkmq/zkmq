@@ -121,7 +121,7 @@ func (broker *brokerImpl) doNotifyConsumer(topic string, offset uint64) []zkmq.B
 
 	for _, l := range listeners {
 		if err := l.Send(offsetChanged); err != nil {
-			broker.DebugF("remove %s listener %p for err %s", topic, l, err)
+			broker.DebugF("notify %s listener %p for err %s", topic, l, err)
 			continue
 		}
 
