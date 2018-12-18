@@ -29,6 +29,7 @@ type consumerImpl struct {
 	listener   zkmq.Broker_ListenClient
 	cacher     chan mq.Record
 	errors     chan error
+	lastRecord *zkmq.Record
 }
 
 // NewConsumer .
@@ -54,18 +55,18 @@ func NewConsumer(config config.Config) (Consumer, error) {
 		return nil, xerrors.Errorf("must set consumer")
 	}
 
-	// listener, err := client.Listen(context.TODO(), &zkmq.Topic{
-	// 	Key: topic,
-	// })
+	listener, err := client.Listen(context.TODO(), &zkmq.Topic{
+		Key: topic,
+	})
 
 	if err != nil {
 		return nil, xerrors.Wrapf(err, "topic listener error")
 	}
 
 	consumer := &consumerImpl{
-		Logger: slf4go.Get("zkmq-consumer"),
-		client: client,
-		// listener:   listener,
+		Logger:     slf4go.Get("zkmq-consumer"),
+		client:     client,
+		listener:   listener,
 		cacher:     make(chan mq.Record, config.Get("cached").Int(1)),
 		errors:     make(chan error, 10),
 		consumerID: consumerID,
@@ -105,6 +106,8 @@ func (consumer *consumerImpl) pullOne() *recordWrapper {
 			Record: records[0],
 		}
 
+		consumer.lastRecord = records[0]
+
 		return nil
 	}, retry.Infinite(), retry.WithBackoff(time.Minute, 1))
 
@@ -121,10 +124,17 @@ func (consumer *consumerImpl) pullOne() *recordWrapper {
 
 func (consumer *consumerImpl) doPull() ([]*zkmq.Record, error) {
 
+	offset := uint64(0)
+
+	if consumer.lastRecord != nil {
+		offset = consumer.lastRecord.Offset + 1
+	}
+
 	resp, err := consumer.client.Pull(context.TODO(), &zkmq.PullRequest{
 		Consumer: consumer.consumerID,
 		Topic:    consumer.topicID,
 		Count:    1,
+		Offset:   offset,
 	})
 
 	if err != nil {

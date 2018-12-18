@@ -62,7 +62,7 @@ func (broker *brokerImpl) Push(ctx context.Context, record *zkmq.Record) (*zkmq.
 
 func (broker *brokerImpl) Pull(ctx context.Context, req *zkmq.PullRequest) (*zkmq.PullResponse, error) {
 
-	records, err := broker.Storage.Read(req.Topic, req.Consumer, req.Count)
+	records, err := broker.Storage.Read(req.Topic, req.Consumer, req.Offset, req.Count)
 
 	if err != nil {
 		return nil, xerrors.Wrapf(err, "read record err")

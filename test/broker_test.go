@@ -119,8 +119,6 @@ func createConsumerProducer() {
 func BenchmarkProducer(t *testing.B) {
 	for i := 0; i < t.N; i++ {
 
-		logger.DebugF("send record")
-
 		record, err := producer.Record([]byte("test"), []byte("hello world"))
 
 		require.NoError(t, err)
@@ -128,8 +126,6 @@ func BenchmarkProducer(t *testing.B) {
 		err = producer.Send(record)
 
 		require.NoError(t, err)
-
-		logger.DebugF("send record -- success")
 
 		r := <-consumer.Recv()
 
