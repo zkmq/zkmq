@@ -134,3 +134,4 @@ func BenchmarkProducer(t *testing.B) {
 		require.NoError(t, err)
 	}
 }
+
