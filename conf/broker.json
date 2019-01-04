@@ -1,19 +1,30 @@
 {
     "slf4go": {
         "default": {
-            "backend": "console"
+            "backend": "aliyun",
+            "config": {
+                "project": "e8game",
+                "endpoint": "cn-hongkong.log.aliyuncs.com",
+                "accesskey": {
+                    "id": "LTAIoCbMMeA2vYum",
+                    "secret": "4mFxX3dwpnDQr1u9WlYJWBYk9xgo5S"
+                },
+                "logstore": "platform_test",
+                "source": "zkmq_testnet",
+                "cached": 0
+            }
         }
     },
     "gomesh": {
         "grpc": {
-            "laddr": ":2019"
+            "laddr": ":2017"
         },
         "service": {
             "zkmq.Storage": {
-                "path": "./storage"
+                "path": "/var/zkmq/storage"
             },
             "zkmq.Metadata": {
-                "path": "./storage"
+                "path": "/var/zkmq/storage"
             },
             "zkmq.Broker": {}
         }
