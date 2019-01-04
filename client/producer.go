@@ -1,7 +1,7 @@
 package client
 
 import (
-	"gx/ipfs/QmRvYNctevGUW52urgmoFZscT6buMKqhHezLUS64WepGWn/go-net/context"
+	"context"
 
 	config "github.com/dynamicgo/go-config"
 	"github.com/dynamicgo/mq"

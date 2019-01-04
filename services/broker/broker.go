@@ -51,6 +51,8 @@ func (broker *brokerImpl) Push(ctx context.Context, record *zkmq.Record) (*zkmq.
 		return nil, xerrors.Wrapf(err, "record(%s) write to storage err", record.GetKey())
 	}
 
+	broker.DebugF("topic(%s) push record(%d) -- success", record.Topic, offset)
+
 	broker.notifyConsumer(record.Topic, offset)
 
 	return &zkmq.PushResponse{
@@ -60,7 +62,7 @@ func (broker *brokerImpl) Push(ctx context.Context, record *zkmq.Record) (*zkmq.
 
 func (broker *brokerImpl) Pull(ctx context.Context, req *zkmq.PullRequest) (*zkmq.PullResponse, error) {
 
-	records, err := broker.Storage.Read(req.Topic, req.Consumer, req.Count)
+	records, err := broker.Storage.Read(req.Topic, req.Consumer, req.Offset, req.Count)
 
 	if err != nil {
 		return nil, xerrors.Wrapf(err, "read record err")
@@ -85,13 +87,19 @@ func (broker *brokerImpl) Commit(ctx context.Context, req *zkmq.CommitRequest) (
 	}, nil
 }
 
-func (broker *brokerImpl) Listen(topic *zkmq.Topic, listener zkmq.Broker_ListenServer) error {
+func (broker *brokerImpl) addListener(topic *zkmq.Topic, listener zkmq.Broker_ListenServer) {
 	broker.Lock()
 	defer broker.Unlock()
 
+	broker.listener[topic.GetKey()] = append(broker.listener[topic.Key], listener)
+}
+
+func (broker *brokerImpl) Listen(topic *zkmq.Topic, listener zkmq.Broker_ListenServer) error {
 	broker.DebugF("append %s listener %p", topic.Key, listener)
 
-	broker.listener[topic.GetKey()] = append(broker.listener[topic.Key], listener)
+	broker.addListener(topic, listener)
+
+	<-listener.Context().Done()
 
 	return nil
 }

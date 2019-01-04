@@ -2,10 +2,13 @@ package metadata
 
 import (
 	"encoding/binary"
-	"gx/ipfs/QmbBhyDKsY4mbY6xsKt3qu9Y7FPvMJ6qbD8AMjYYvPRw1g/goleveldb/leveldb"
+
+	"github.com/syndtr/goleveldb/leveldb/opt"
+
 	"path/filepath"
 
 	"github.com/dynamicgo/slf4go"
+	"github.com/syndtr/goleveldb/leveldb"
 
 	"github.com/dynamicgo/xerrors"
 
@@ -79,6 +82,7 @@ func (metadata *metadataSqlite) CommitOffset(topic, consumer string, offset uint
 
 	if err != nil {
 		if err != leveldb.ErrNotFound {
+			trans.Discard()
 			return 0, xerrors.Wrapf(err, "open topic %s metadata error", topic)
 		}
 
@@ -95,15 +99,18 @@ func (metadata *metadataSqlite) CommitOffset(topic, consumer string, offset uint
 
 	metadata.DebugF("consumer(%s) topic(%s) commit offset %d", consumer, topic, offset)
 
-	err = trans.Put([]byte(topic+consumer), metadata.OffsetToBytes(offset), nil)
+	err = trans.Put([]byte(topic+consumer), metadata.OffsetToBytes(offset), &opt.WriteOptions{Sync: true})
 
 	if err != nil {
+		trans.Discard()
 		return 0, xerrors.Wrapf(err, "consumer %s write topic %s offset %d metadata error", consumer, topic, offset)
 	}
 
 	if err := trans.Commit(); err != nil {
 		return 0, xerrors.Wrapf(err, "consumer %s write topic %s offset %d metadata error", consumer, topic, offset)
 	}
+
+	metadata.DebugF("consumer(%s) topic(%s) commit offset %d -- success", consumer, topic, offset)
 
 	return offset, nil
 }
@@ -122,6 +129,7 @@ func (metadata *metadataSqlite) CommitTopicHeader(topic string, offset uint64) (
 
 	if err != nil {
 		if err != leveldb.ErrNotFound {
+			trans.Discard()
 			return 0, xerrors.Wrapf(err, "open topic %s metadata error", topic)
 		}
 
@@ -138,6 +146,7 @@ func (metadata *metadataSqlite) CommitTopicHeader(topic string, offset uint64) (
 	err = trans.Put([]byte(topic), metadata.OffsetToBytes(offset), nil)
 
 	if err != nil {
+		trans.Discard()
 		return 0, xerrors.Wrapf(err, "write topic %s offset %d metadata error", topic, offset)
 	}
 

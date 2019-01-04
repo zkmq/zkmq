@@ -8,7 +8,7 @@ type Storage interface {
 	Offset(topic string) uint64
 	ConsumerOffset(topic string, consumer string) uint64
 	CommitOffset(topic, consumer string, offset uint64) (uint64, error)
-	Read(topic string, consumer string, number uint64) ([]*Record, error)
+	Read(topic string, consumer string, offset uint64, number uint64) ([]*Record, error)
 }
 
 // Metadata .

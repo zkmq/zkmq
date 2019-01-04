@@ -2,7 +2,6 @@ package test
 
 import (
 	"testing"
-	"time"
 
 	extend "github.com/dynamicgo/go-config-extend"
 
@@ -98,27 +97,28 @@ func createConsumerProducer() {
 	}
 }
 
-func TestPushMessage(t *testing.T) {
+// func TestPushMessage(t *testing.T) {
 
-	record, err := producer.Record([]byte("test"), []byte("hello world"))
+// 	record, err := producer.Record([]byte("test"), []byte("hello world"))
 
-	require.NoError(t, err)
+// 	require.NoError(t, err)
 
-	err = producer.Send(record)
+// 	err = producer.Send(record)
 
-	require.NoError(t, err)
+// 	require.NoError(t, err)
 
-	r := <-consumer.Recv()
+// 	r := <-consumer.Recv()
 
-	err = consumer.Commit(r)
+// 	err = consumer.Commit(r)
 
-	require.NoError(t, err)
+// 	require.NoError(t, err)
 
-	time.Sleep(time.Second * 1)
-}
+// 	time.Sleep(time.Second * 1)
+// }
 
 func BenchmarkProducer(t *testing.B) {
 	for i := 0; i < t.N; i++ {
+
 		record, err := producer.Record([]byte("test"), []byte("hello world"))
 
 		require.NoError(t, err)

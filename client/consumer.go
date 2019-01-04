@@ -6,7 +6,6 @@ import (
 
 	config "github.com/dynamicgo/go-config"
 	"github.com/dynamicgo/mq"
-	"github.com/dynamicgo/retry"
 	"github.com/dynamicgo/slf4go"
 	"github.com/dynamicgo/xerrors"
 	"github.com/zkmq/zkmq"
@@ -23,12 +22,15 @@ func (record *recordWrapper) Value() []byte {
 
 type consumerImpl struct {
 	slf4go.Logger
-	consumerID string
-	topicID    string
-	client     zkmq.BrokerClient
-	listener   zkmq.Broker_ListenClient
-	cacher     chan mq.Record
-	errors     chan error
+	consumerID   string
+	topicID      string
+	client       zkmq.BrokerClient
+	listener     zkmq.Broker_ListenClient
+	cacher       chan mq.Record
+	errors       chan error
+	notifyChan   chan uint64
+	lastRecord   *zkmq.Record
+	retryTimeout time.Duration
 }
 
 // NewConsumer .
@@ -54,23 +56,27 @@ func NewConsumer(config config.Config) (Consumer, error) {
 		return nil, xerrors.Errorf("must set consumer")
 	}
 
-	// listener, err := client.Listen(context.TODO(), &zkmq.Topic{
-	// 	Key: topic,
-	// })
+	listener, err := client.Listen(context.Background(), &zkmq.Topic{
+		Key: topic,
+	})
 
 	if err != nil {
 		return nil, xerrors.Wrapf(err, "topic listener error")
 	}
 
 	consumer := &consumerImpl{
-		Logger: slf4go.Get("zkmq-consumer"),
-		client: client,
-		// listener:   listener,
-		cacher:     make(chan mq.Record, config.Get("cached").Int(1)),
-		errors:     make(chan error, 10),
-		consumerID: consumerID,
-		topicID:    topic,
+		Logger:       slf4go.Get("zkmq-consumer"),
+		client:       client,
+		listener:     listener,
+		cacher:       make(chan mq.Record, config.Get("cached").Int(1)),
+		errors:       make(chan error, 10),
+		notifyChan:   make(chan uint64, 100),
+		consumerID:   consumerID,
+		topicID:      topic,
+		retryTimeout: config.Get("backoff").Duration(time.Second * 30),
 	}
+
+	go consumer.listenLoop()
 
 	go consumer.pullLoop()
 
@@ -79,52 +85,76 @@ func NewConsumer(config config.Config) (Consumer, error) {
 
 func (consumer *consumerImpl) pullLoop() {
 
+	ticker := time.NewTicker(consumer.retryTimeout)
+	defer ticker.Stop()
+
 	// consumer.listener.Recv()
 
 	for {
-		consumer.cacher <- consumer.pullOne()
+
+		record, err := consumer.pullOne()
+
+		if err == nil {
+			consumer.cacher <- record
+			continue
+		}
+
+		select {
+		case <-ticker.C:
+		case <-consumer.notifyChan:
+		}
 	}
 }
 
-func (consumer *consumerImpl) pullOne() *recordWrapper {
-	var record *recordWrapper
-
-	action := retry.New(func(ctx context.Context) error {
-
-		records, err := consumer.doPull()
+func (consumer *consumerImpl) listenLoop() {
+	for {
+		changed, err := consumer.listener.Recv()
 
 		if err != nil {
-			return err
-		}
-
-		if len(records) == 0 {
-			return xerrors.New("empty consumer queue")
-		}
-
-		record = &recordWrapper{
-			Record: records[0],
-		}
-
-		return nil
-	}, retry.Infinite(), retry.WithBackoff(time.Minute, 1))
-
-	for {
-		select {
-		case <-action.Do():
-			consumer.DebugF("consumer(%s) pull topic(%s) record(%d)", consumer.consumerID, consumer.topicID, record.GetOffset())
-			return record
-		case err := <-action.Error():
 			consumer.errors <- err
+			continue
 		}
+
+		consumer.notifyChan <- changed.Offset
 	}
+
+}
+
+func (consumer *consumerImpl) pullOne() (*recordWrapper, error) {
+	var record *recordWrapper
+
+	records, err := consumer.doPull()
+
+	if err != nil {
+		return nil, err
+	}
+
+	if len(records) == 0 {
+		return nil, xerrors.New("empty consumer queue")
+	}
+
+	record = &recordWrapper{
+		Record: records[0],
+	}
+
+	consumer.lastRecord = records[0]
+
+	return record, nil
 }
 
 func (consumer *consumerImpl) doPull() ([]*zkmq.Record, error) {
+
+	offset := uint64(0)
+
+	if consumer.lastRecord != nil {
+		offset = consumer.lastRecord.Offset + 1
+	}
 
 	resp, err := consumer.client.Pull(context.TODO(), &zkmq.PullRequest{
 		Consumer: consumer.consumerID,
 		Topic:    consumer.topicID,
 		Count:    1,
+		Offset:   offset,
 	})
 
 	if err != nil {
