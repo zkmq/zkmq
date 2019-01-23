@@ -76,6 +76,8 @@ func (broker *brokerImpl) Pull(ctx context.Context, req *zkmq.PullRequest) (*zkm
 
 func (broker *brokerImpl) Commit(ctx context.Context, req *zkmq.CommitRequest) (*zkmq.CommitRespose, error) {
 
+	broker.DebugF("consumer %s commit topic %s with offset %d", req.Consumer, req.Topic, req.Offset)
+
 	offset, err := broker.Storage.CommitOffset(req.Topic, req.Consumer, req.Offset)
 
 	if err != nil {
