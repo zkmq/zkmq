@@ -112,6 +112,7 @@ func (consumer *consumerImpl) listenLoop() {
 
 		if err != nil {
 			consumer.errors <- err
+			time.Sleep(consumer.retryTimeout)
 			continue
 		}
 
