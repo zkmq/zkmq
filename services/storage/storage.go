@@ -125,7 +125,7 @@ func (storage *storageLevelDB) Read(topic string, consumer string, applyoffset u
 		offset = applyoffset
 	}
 
-	storage.DebugF("consumer(%s) topic(%s) read record from %d to %d", topic, consumer, offset, offset+number)
+	storage.DebugF("topic(%s) consumer(%s) read record from %d to %d", topic, consumer, offset, offset+number)
 
 	return topicStorage.readRecord(offset, number)
 }

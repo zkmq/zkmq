@@ -151,6 +151,8 @@ func (consumer *consumerImpl) doPull() ([]*zkmq.Record, error) {
 		offset = consumer.lastRecord.Offset + 1
 	}
 
+	consumer.DebugF("consumer %s pull topic %s with offset %d", consumer.consumerID, consumer.topicID, offset)
+
 	resp, err := consumer.client.Pull(context.TODO(), &zkmq.PullRequest{
 		Consumer: consumer.consumerID,
 		Topic:    consumer.topicID,
