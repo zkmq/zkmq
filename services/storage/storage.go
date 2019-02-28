@@ -121,6 +121,8 @@ func (storage *storageLevelDB) Read(topic string, consumer string, applyoffset u
 		return nil, err
 	}
 
+	storage.DebugF("topic(%s) consumer(%s) current offset %d", topic, consumer, offset)
+
 	if applyoffset > offset {
 		offset = applyoffset
 	}
