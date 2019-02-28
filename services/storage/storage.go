@@ -121,7 +121,13 @@ func (storage *storageLevelDB) Read(topic string, consumer string, applyoffset u
 		return nil, err
 	}
 
-	storage.DebugF("topic(%s) consumer(%s) current offset %d", topic, consumer, offset)
+	topicHeader, err := storage.Metadata.TopicHeader(topic)
+
+	if err != nil {
+		return nil, err
+	}
+
+	storage.DebugF("topic(%s) consumer(%s) current offset %d, topic offset %d", topic, consumer, offset, topicHeader)
 
 	if applyoffset > offset {
 		offset = applyoffset
