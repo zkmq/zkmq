@@ -24,7 +24,7 @@ type RemoteF func(conn *grpc.ClientConn) (Service, error)
 type Register interface {
 	LocalService(name string, F F)
 	RemoteService(name string, F RemoteF)
-	Start(agent Agent) error
+	Start(agent Agent, tccServer TccServer) error
 }
 
 type serviceF struct {
@@ -47,6 +47,8 @@ type serviceRegister struct {
 	grpcServerNames []string          // grpc server names
 	runnables       []RunnableService // runnable services
 	runnableNames   []string          // runnable service names
+	tccServer       TccServer         // tcc resource manager
+
 }
 
 // NewServiceRegister .
@@ -102,6 +104,8 @@ func (register *serviceRegister) RemoteService(name string, F RemoteF) {
 
 func (register *serviceRegister) bindRemoteServices(agent Agent) error {
 
+	register.DebugF("register remote serivce ...")
+
 	for _, sf := range register.remoteServices {
 		register.InfoF("register remote service %s", sf.Name)
 		conn, err := agent.Connect(sf.Name)
@@ -119,10 +123,15 @@ func (register *serviceRegister) bindRemoteServices(agent Agent) error {
 		register.context.Register(sf.Name, service)
 	}
 
+	register.DebugF("register remote serivce -- success")
+
 	return nil
 }
 
-func (register *serviceRegister) Start(agent Agent) error {
+func (register *serviceRegister) Start(agent Agent, tccServer TccServer) error {
+
+	register.tccServer = tccServer
+
 	register.RLock()
 	defer register.RUnlock()
 
@@ -139,6 +148,9 @@ func (register *serviceRegister) Start(agent Agent) error {
 
 	var grpcServices []GrpcService
 	var grpcServiceNames []string
+
+	var tccServices []TccService
+	var tccServiceNames []string
 
 	// create services
 	for _, f := range register.factories {
@@ -171,12 +183,25 @@ func (register *serviceRegister) Start(agent Agent) error {
 			grpcServiceNames = append(grpcServiceNames, f.Name)
 		}
 
+		if tccResourceService, ok := service.(TccService); ok {
+			tccServices = append(tccServices, tccResourceService)
+			tccServiceNames = append(tccServiceNames, f.Name)
+		}
+
+	}
+
+	if len(tccServices) > 0 && tccServer == nil {
+		return xerrors.New("tcc resource required import mesh.tccServer implement package")
 	}
 
 	for i, service := range services {
 		if err := register.context.Bind(service); err != nil {
 			return xerrors.Wrapf(err, "service %s bind error", register.factories[i].Name)
 		}
+	}
+
+	for i := 0; i < len(tccServices); i++ {
+		tccServices[i].TccHandle(tccServer)
 	}
 
 	if err := register.startRunnableServices(agent, runnableNames, runnables); err != nil {
@@ -239,12 +264,34 @@ func (register *serviceRegister) startGrpcServices(agent Agent, grpcServiceNames
 func (register *serviceRegister) UnaryServerInterceptor(
 	ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 
+	if register.tccServer != nil {
+		var err error
+		ctx, err = register.tccServer.BeforeRequire(ctx, info.FullMethod)
+
+		if err != nil {
+			register.ErrorF("tcc resource %s before lock err %s", info.FullMethod, err)
+			err = apierr.AsGrpcError(apierr.As(err, apierr.New(-1, "UNKNOWN")))
+			return nil, err
+		}
+	}
+
+	register.TraceF("call %s with request %s", info.FullMethod, req)
+
 	resp, err := handler(ctx, req)
 
 	if err != nil {
 		register.ErrorF("call %s err %s", info.FullMethod, err)
 		err = apierr.AsGrpcError(apierr.As(err, apierr.New(-1, "UNKNOWN")))
+	}
 
+	if register.tccServer != nil {
+		err := register.tccServer.AfterRequire(ctx, info.FullMethod)
+
+		if err != nil {
+			register.ErrorF("tcc resource %s after lock err %s", info.FullMethod, err)
+			err = apierr.AsGrpcError(apierr.As(err, apierr.New(-1, "UNKNOWN")))
+			return nil, err
+		}
 	}
 
 	return resp, err

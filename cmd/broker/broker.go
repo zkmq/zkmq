@@ -2,10 +2,10 @@ package main
 
 import (
 	config "github.com/dynamicgo/go-config"
-	"github.com/dynamicgo/gomesh"
-	_ "github.com/dynamicgo/gomesh/agent/basic"
-	"github.com/dynamicgo/gomesh/app"
 	_ "github.com/dynamicgo/slf4go-aliyun"
+	_ "github.com/gomeshnetwork/agent/basic"
+	"github.com/gomeshnetwork/gomesh"
+	"github.com/gomeshnetwork/gomesh/app"
 	"github.com/zkmq/zkmq/services/broker"
 	"github.com/zkmq/zkmq/services/metadata"
 	"github.com/zkmq/zkmq/services/storage"
@@ -25,4 +25,5 @@ func main() {
 	})
 
 	app.Run("zkmq-broker")
+
 }

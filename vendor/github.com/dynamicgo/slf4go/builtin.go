@@ -14,14 +14,20 @@ type colorConsole struct {
 	messages chan func()
 }
 
+var once sync.Once
+var colorC *colorConsole
+
 func newColorConsole() LoggerFactory {
-	console := &colorConsole{
-		messages: make(chan func(), 1000),
-	}
 
-	go console.runLoop()
+	once.Do(func() {
+		colorC = &colorConsole{
+			messages: make(chan func(), 1000),
+		}
 
-	return console
+		go colorC.runLoop()
+	})
+
+	return colorC
 }
 
 var mutex sync.Mutex

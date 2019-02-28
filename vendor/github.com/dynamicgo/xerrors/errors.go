@@ -62,8 +62,6 @@ func (facade *facadeImpl) As(err error, target interface{}) bool {
 	current := err
 
 	for {
-		println(reflect.TypeOf(current).String())
-
 		currentT := reflect.TypeOf(current)
 
 		if currentT == errT || currentT.Implements(errT) {
