@@ -64,11 +64,15 @@ func (producer *producerImpl) Send(record mq.Record) error {
 
 	r.Topic = producer.topicID
 
+	producer.DebugF("topic %s push record %s", r.Topic, string(r.Key))
+
 	_, err := producer.client.Push(context.TODO(), r)
 
 	if err != nil {
 		return xerrors.Wrapf(err, "producer %s push %s record error", producer.producerID, producer.topicID)
 	}
+
+	producer.DebugF("topic %s push record %s -- success", r.Topic, string(r.Key))
 
 	return nil
 }
