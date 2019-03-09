@@ -95,7 +95,7 @@ func (consumer *consumerImpl) pullLoop() {
 		record, err := consumer.pullOne()
 
 		if err == nil {
-			consumer.DebugF("cache record %d", record.Offset)
+			consumer.DebugF("consumer %s of topic %s cache record %d", consumer.consumerID, consumer.topicID, record.Offset)
 			consumer.cacher <- record
 			continue
 		}
@@ -141,7 +141,7 @@ func (consumer *consumerImpl) pullOne() (*recordWrapper, error) {
 
 	consumer.lastRecord = records[0]
 
-	consumer.DebugF("last record %d", consumer.lastRecord.Offset)
+	consumer.DebugF("last record %d of topc %s", consumer.lastRecord.Offset, consumer.topicID)
 
 	return record, nil
 }
