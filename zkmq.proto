@@ -38,10 +38,14 @@ message OffsetChanged {
   uint64 offset = 3;
 }
 
-service Broker {
+service Agent {
   rpc Push(Record) returns (PushResponse);
   rpc BatchPush(BatchPushRequest) returns (PushResponse);
   rpc Pull(PullRequest) returns (PullResponse);
   rpc Commit(CommitRequest) returns (CommitRespose);
   rpc Listen(Topic) returns (stream OffsetChanged);
+}
+
+service Broker {
+  
 }
