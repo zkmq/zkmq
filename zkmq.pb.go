@@ -453,6 +453,76 @@ func (m *OffsetChanged) GetOffset() uint64 {
 	return 0
 }
 
+type HandshakeRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *HandshakeRequest) Reset()         { *m = HandshakeRequest{} }
+func (m *HandshakeRequest) String() string { return proto.CompactTextString(m) }
+func (*HandshakeRequest) ProtoMessage()    {}
+func (*HandshakeRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f92f6a188edddc82, []int{9}
+}
+
+func (m *HandshakeRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_HandshakeRequest.Unmarshal(m, b)
+}
+func (m *HandshakeRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_HandshakeRequest.Marshal(b, m, deterministic)
+}
+func (m *HandshakeRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HandshakeRequest.Merge(m, src)
+}
+func (m *HandshakeRequest) XXX_Size() int {
+	return xxx_messageInfo_HandshakeRequest.Size(m)
+}
+func (m *HandshakeRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_HandshakeRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_HandshakeRequest proto.InternalMessageInfo
+
+type HandshakeRespose struct {
+	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *HandshakeRespose) Reset()         { *m = HandshakeRespose{} }
+func (m *HandshakeRespose) String() string { return proto.CompactTextString(m) }
+func (*HandshakeRespose) ProtoMessage()    {}
+func (*HandshakeRespose) Descriptor() ([]byte, []int) {
+	return fileDescriptor_f92f6a188edddc82, []int{10}
+}
+
+func (m *HandshakeRespose) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_HandshakeRespose.Unmarshal(m, b)
+}
+func (m *HandshakeRespose) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_HandshakeRespose.Marshal(b, m, deterministic)
+}
+func (m *HandshakeRespose) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_HandshakeRespose.Merge(m, src)
+}
+func (m *HandshakeRespose) XXX_Size() int {
+	return xxx_messageInfo_HandshakeRespose.Size(m)
+}
+func (m *HandshakeRespose) XXX_DiscardUnknown() {
+	xxx_messageInfo_HandshakeRespose.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_HandshakeRespose proto.InternalMessageInfo
+
+func (m *HandshakeRespose) GetId() string {
+	if m != nil {
+		return m.Id
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Record)(nil), "zkmq.Record")
 	proto.RegisterType((*BatchPushRequest)(nil), "zkmq.BatchPushRequest")
@@ -463,37 +533,35 @@ func init() {
 	proto.RegisterType((*CommitRespose)(nil), "zkmq.CommitRespose")
 	proto.RegisterType((*Topic)(nil), "zkmq.Topic")
 	proto.RegisterType((*OffsetChanged)(nil), "zkmq.OffsetChanged")
+	proto.RegisterType((*HandshakeRequest)(nil), "zkmq.HandshakeRequest")
+	proto.RegisterType((*HandshakeRespose)(nil), "zkmq.HandshakeRespose")
 }
 
 func init() { proto.RegisterFile("zkmq.proto", fileDescriptor_f92f6a188edddc82) }
 
 var fileDescriptor_f92f6a188edddc82 = []byte{
-	// 387 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0xcf, 0x4f, 0xf2, 0x30,
-	0x18, 0x4e, 0xd9, 0xd8, 0xf7, 0xf1, 0x02, 0x09, 0x5f, 0x3f, 0x42, 0x26, 0xf1, 0xb0, 0x2c, 0x46,
-	0x77, 0x50, 0x62, 0xd0, 0x44, 0xcf, 0x70, 0x35, 0x91, 0x2c, 0x5e, 0x8c, 0x27, 0x98, 0x45, 0x16,
-	0xb6, 0x76, 0xb4, 0xdd, 0x41, 0xff, 0x76, 0x0f, 0xa6, 0xeb, 0xc6, 0x56, 0x22, 0x89, 0xf1, 0xd6,
-	0xa7, 0xef, 0xbb, 0x3e, 0x3f, 0xde, 0x77, 0x00, 0x1f, 0xdb, 0x74, 0x37, 0xc9, 0x38, 0x93, 0x0c,
-	0xdb, 0xea, 0xec, 0xaf, 0xc0, 0x09, 0x49, 0xc4, 0xf8, 0x2b, 0x1e, 0x42, 0x5b, 0xb2, 0x2c, 0x8e,
-	0x5c, 0xe4, 0xa1, 0xa0, 0x13, 0x6a, 0x80, 0x07, 0x60, 0x6d, 0xc9, 0xbb, 0xdb, 0xf2, 0x50, 0xd0,
-	0x0b, 0xd5, 0x11, 0xbb, 0xf0, 0x27, 0x62, 0x54, 0x12, 0x2a, 0x5d, 0xab, 0xb8, 0xad, 0x20, 0x1e,
-	0x81, 0xc3, 0xd6, 0x6b, 0x41, 0xa4, 0x6b, 0x7b, 0x28, 0xb0, 0xc3, 0x12, 0xf9, 0xf7, 0x30, 0x98,
-	0x2d, 0x65, 0xb4, 0x59, 0xe4, 0x62, 0x13, 0x92, 0x5d, 0x4e, 0x84, 0xc4, 0x67, 0xe0, 0xf0, 0x82,
-	0xd7, 0x45, 0x9e, 0x15, 0x74, 0xa7, 0xbd, 0x49, 0x21, 0x4d, 0x6b, 0x09, 0xcb, 0x9a, 0x7f, 0x0e,
-	0x3d, 0xfd, 0x91, 0xc8, 0x18, 0x15, 0xa4, 0xc1, 0x80, 0x0c, 0x86, 0x14, 0xba, 0x8b, 0x3c, 0x49,
-	0xaa, 0xc7, 0xc7, 0xf0, 0x37, 0x62, 0x54, 0xe4, 0x29, 0xe1, 0xa5, 0x9b, 0x3d, 0xae, 0x6d, 0xb6,
-	0x9a, 0x36, 0x87, 0xd0, 0x8e, 0x58, 0x5e, 0x5a, 0xb2, 0x43, 0x0d, 0x8e, 0x1a, 0xba, 0x55, 0xb2,
-	0x14, 0x5d, 0x29, 0xeb, 0x67, 0x66, 0x9e, 0xa1, 0x3f, 0x67, 0x69, 0x1a, 0xcb, 0xdf, 0xcb, 0xac,
-	0x05, 0x59, 0x86, 0xa0, 0x8b, 0xfa, 0x69, 0x91, 0x31, 0x23, 0xa8, 0x96, 0xd1, 0x78, 0x02, 0xed,
-	0xa7, 0xe6, 0x5c, 0x35, 0xad, 0x3a, 0xfa, 0x2f, 0xd0, 0x7f, 0x2c, 0x9a, 0xe6, 0x9b, 0x25, 0x7d,
-	0x23, 0xc7, 0x16, 0xe2, 0x14, 0x3a, 0xd9, 0x92, 0xcb, 0x58, 0xc6, 0x8c, 0x96, 0xe2, 0xea, 0x8b,
-	0x63, 0x02, 0xa7, 0x9f, 0x08, 0x9c, 0x19, 0x67, 0x5b, 0xc2, 0x71, 0x00, 0xb6, 0x9a, 0x29, 0x36,
-	0x42, 0x1a, 0x63, 0x8d, 0x8c, 0x69, 0xdf, 0x41, 0x67, 0xbf, 0x37, 0x78, 0xa4, 0x1b, 0x0e, 0x17,
-	0xe9, 0xdb, 0x0f, 0xaf, 0x14, 0x45, 0x92, 0xe0, 0x7f, 0x55, 0x6d, 0xbf, 0x1a, 0x75, 0x7b, 0x63,
-	0x7c, 0x53, 0x70, 0x74, 0x7a, 0xf8, 0xbf, 0xae, 0x1a, 0x63, 0x1a, 0x1f, 0x5c, 0xea, 0x80, 0x2f,
-	0xc1, 0x79, 0x88, 0x85, 0x24, 0x14, 0x77, 0x75, 0xb9, 0x88, 0xb5, 0xea, 0x35, 0x82, 0xbc, 0x46,
-	0x2b, 0xa7, 0xf8, 0xe5, 0x6e, 0xbe, 0x02, 0x00, 0x00, 0xff, 0xff, 0x49, 0xa6, 0xc8, 0x23, 0x80,
-	0x03, 0x00, 0x00,
+	// 333 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x92, 0x4f, 0x4f, 0x83, 0x40,
+	0x10, 0xc5, 0xc3, 0x9f, 0x62, 0x3b, 0x6d, 0x4d, 0xb3, 0x69, 0x0c, 0x1a, 0x0f, 0x84, 0x18, 0xe5,
+	0xd4, 0x43, 0xf5, 0xe0, 0xb9, 0xbd, 0x78, 0xb3, 0xd9, 0x78, 0x31, 0x9e, 0x28, 0x6c, 0x85, 0x50,
+	0x76, 0xe8, 0xee, 0x72, 0xd0, 0x4f, 0x6f, 0x60, 0xb7, 0x52, 0x0e, 0x4d, 0x8c, 0xb7, 0x79, 0xc3,
+	0x30, 0xef, 0xf7, 0x60, 0x00, 0xbe, 0x8b, 0xf2, 0xb0, 0xa8, 0x04, 0x2a, 0x24, 0x6e, 0x53, 0x87,
+	0x5b, 0xf0, 0x28, 0x4b, 0x50, 0xa4, 0x64, 0x0e, 0x03, 0x85, 0x55, 0x9e, 0xf8, 0x56, 0x60, 0x45,
+	0x23, 0xaa, 0x05, 0x99, 0x81, 0x53, 0xb0, 0x2f, 0xdf, 0x0e, 0xac, 0x68, 0x42, 0x9b, 0x92, 0xf8,
+	0x70, 0x91, 0x20, 0x57, 0x8c, 0x2b, 0xdf, 0x69, 0xbb, 0x47, 0x49, 0xae, 0xc0, 0xc3, 0xdd, 0x4e,
+	0x32, 0xe5, 0xbb, 0x81, 0x15, 0xb9, 0xd4, 0xa8, 0xf0, 0x19, 0x66, 0xab, 0x58, 0x25, 0xd9, 0xa6,
+	0x96, 0x19, 0x65, 0x87, 0x9a, 0x49, 0x45, 0xee, 0xc0, 0x13, 0xad, 0xaf, 0x6f, 0x05, 0x4e, 0x34,
+	0x5e, 0x4e, 0x16, 0x2d, 0x9a, 0x66, 0xa1, 0xe6, 0x59, 0x78, 0x0f, 0x13, 0xfd, 0x92, 0xac, 0x90,
+	0x4b, 0x76, 0xe2, 0x60, 0xf5, 0x1c, 0x4a, 0x18, 0x6f, 0xea, 0xfd, 0xfe, 0xb8, 0xfc, 0x06, 0x86,
+	0x09, 0x72, 0x59, 0x97, 0x4c, 0x98, 0x34, 0xbf, 0xba, 0x8b, 0x69, 0x9f, 0xc6, 0x9c, 0xc3, 0x20,
+	0xc1, 0xda, 0x44, 0x72, 0xa9, 0x16, 0x67, 0x03, 0x3d, 0x35, 0x58, 0x8d, 0x9d, 0xc1, 0xfa, 0x5b,
+	0x98, 0x77, 0x98, 0xae, 0xb1, 0x2c, 0x73, 0xf5, 0x7f, 0xcc, 0x0e, 0xc8, 0xe9, 0x01, 0x3d, 0x74,
+	0xab, 0x65, 0x85, 0xbd, 0x0f, 0x65, 0xf7, 0x06, 0xaf, 0x61, 0xf0, 0x76, 0xfa, 0x5f, 0xb5, 0x6d,
+	0x53, 0x86, 0x1f, 0x30, 0x7d, 0x6d, 0x87, 0xd6, 0x59, 0xcc, 0x3f, 0xd9, 0xb9, 0x83, 0xb8, 0x85,
+	0x51, 0x15, 0x0b, 0x95, 0xab, 0x1c, 0xb9, 0x81, 0xeb, 0x1a, 0x67, 0x01, 0x09, 0xcc, 0x5e, 0x62,
+	0x9e, 0xca, 0x2c, 0x2e, 0x98, 0x89, 0x1f, 0x86, 0xbd, 0x9e, 0xe6, 0xbe, 0x04, 0x3b, 0x4f, 0x8d,
+	0xa1, 0x9d, 0xa7, 0xcb, 0x21, 0x78, 0x2b, 0x81, 0x05, 0x13, 0x5b, 0xaf, 0xbd, 0xda, 0xc7, 0x9f,
+	0x00, 0x00, 0x00, 0xff, 0xff, 0x43, 0x15, 0x77, 0x73, 0xc3, 0x02, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -508,11 +576,6 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type BrokerClient interface {
-	Push(ctx context.Context, in *Record, opts ...grpc.CallOption) (*PushResponse, error)
-	BatchPush(ctx context.Context, in *BatchPushRequest, opts ...grpc.CallOption) (*PushResponse, error)
-	Pull(ctx context.Context, in *PullRequest, opts ...grpc.CallOption) (*PullResponse, error)
-	Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitRespose, error)
-	Listen(ctx context.Context, in *Topic, opts ...grpc.CallOption) (Broker_ListenClient, error)
 }
 
 type brokerClient struct {
@@ -523,207 +586,18 @@ func NewBrokerClient(cc *grpc.ClientConn) BrokerClient {
 	return &brokerClient{cc}
 }
 
-func (c *brokerClient) Push(ctx context.Context, in *Record, opts ...grpc.CallOption) (*PushResponse, error) {
-	out := new(PushResponse)
-	err := c.cc.Invoke(ctx, "/zkmq.Broker/Push", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *brokerClient) BatchPush(ctx context.Context, in *BatchPushRequest, opts ...grpc.CallOption) (*PushResponse, error) {
-	out := new(PushResponse)
-	err := c.cc.Invoke(ctx, "/zkmq.Broker/BatchPush", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *brokerClient) Pull(ctx context.Context, in *PullRequest, opts ...grpc.CallOption) (*PullResponse, error) {
-	out := new(PullResponse)
-	err := c.cc.Invoke(ctx, "/zkmq.Broker/Pull", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *brokerClient) Commit(ctx context.Context, in *CommitRequest, opts ...grpc.CallOption) (*CommitRespose, error) {
-	out := new(CommitRespose)
-	err := c.cc.Invoke(ctx, "/zkmq.Broker/Commit", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *brokerClient) Listen(ctx context.Context, in *Topic, opts ...grpc.CallOption) (Broker_ListenClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_Broker_serviceDesc.Streams[0], "/zkmq.Broker/Listen", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &brokerListenClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type Broker_ListenClient interface {
-	Recv() (*OffsetChanged, error)
-	grpc.ClientStream
-}
-
-type brokerListenClient struct {
-	grpc.ClientStream
-}
-
-func (x *brokerListenClient) Recv() (*OffsetChanged, error) {
-	m := new(OffsetChanged)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // BrokerServer is the server API for Broker service.
 type BrokerServer interface {
-	Push(context.Context, *Record) (*PushResponse, error)
-	BatchPush(context.Context, *BatchPushRequest) (*PushResponse, error)
-	Pull(context.Context, *PullRequest) (*PullResponse, error)
-	Commit(context.Context, *CommitRequest) (*CommitRespose, error)
-	Listen(*Topic, Broker_ListenServer) error
 }
 
 func RegisterBrokerServer(s *grpc.Server, srv BrokerServer) {
 	s.RegisterService(&_Broker_serviceDesc, srv)
 }
 
-func _Broker_Push_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Record)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BrokerServer).Push(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/zkmq.Broker/Push",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BrokerServer).Push(ctx, req.(*Record))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Broker_BatchPush_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(BatchPushRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BrokerServer).BatchPush(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/zkmq.Broker/BatchPush",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BrokerServer).BatchPush(ctx, req.(*BatchPushRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Broker_Pull_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PullRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BrokerServer).Pull(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/zkmq.Broker/Pull",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BrokerServer).Pull(ctx, req.(*PullRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Broker_Commit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CommitRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BrokerServer).Commit(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/zkmq.Broker/Commit",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BrokerServer).Commit(ctx, req.(*CommitRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Broker_Listen_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(Topic)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(BrokerServer).Listen(m, &brokerListenServer{stream})
-}
-
-type Broker_ListenServer interface {
-	Send(*OffsetChanged) error
-	grpc.ServerStream
-}
-
-type brokerListenServer struct {
-	grpc.ServerStream
-}
-
-func (x *brokerListenServer) Send(m *OffsetChanged) error {
-	return x.ServerStream.SendMsg(m)
-}
-
 var _Broker_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "zkmq.Broker",
 	HandlerType: (*BrokerServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Push",
-			Handler:    _Broker_Push_Handler,
-		},
-		{
-			MethodName: "BatchPush",
-			Handler:    _Broker_BatchPush_Handler,
-		},
-		{
-			MethodName: "Pull",
-			Handler:    _Broker_Pull_Handler,
-		},
-		{
-			MethodName: "Commit",
-			Handler:    _Broker_Commit_Handler,
-		},
-	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "Listen",
-			Handler:       _Broker_Listen_Handler,
-			ServerStreams: true,
-		},
-	},
-	Metadata: "zkmq.proto",
+	Methods:     []grpc.MethodDesc{},
+	Streams:     []grpc.StreamDesc{},
+	Metadata:    "zkmq.proto",
 }

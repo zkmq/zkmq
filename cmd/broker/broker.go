@@ -7,8 +7,8 @@ import (
 	"github.com/gomeshnetwork/gomesh"
 	"github.com/gomeshnetwork/gomesh/app"
 	"github.com/zkmq/zkmq/services/broker"
-	"github.com/zkmq/zkmq/services/metadata"
-	"github.com/zkmq/zkmq/services/storage"
+	"github.com/zkmq/zkmq/services/cluster"
+	"github.com/zkmq/zkmq/services/etcd"
 )
 
 func main() {
@@ -16,12 +16,12 @@ func main() {
 		return broker.New(config)
 	})
 
-	gomesh.LocalService("zkmq.Storage", func(config config.Config) (gomesh.Service, error) {
-		return storage.New(config)
+	gomesh.LocalService("zkmq.Etcd", func(config config.Config) (gomesh.Service, error) {
+		return etcd.New(config)
 	})
 
-	gomesh.LocalService("zkmq.Metadata", func(config config.Config) (gomesh.Service, error) {
-		return metadata.New(config)
+	gomesh.LocalService("zkmq.Cluster", func(config config.Config) (gomesh.Service, error) {
+		return cluster.New(config)
 	})
 
 	app.Run("zkmq-broker")

@@ -1,0 +1,37 @@
+{
+    "slf4go": {
+        "default": {
+            "backend": "console",
+            "config": {
+                "project": "e8game",
+                "endpoint": "cn-hongkong.log.aliyuncs.com",
+                "accesskey": {
+                    "id": "LTAIoCbMMeA2vYum",
+                    "secret": "4mFxX3dwpnDQr1u9WlYJWBYk9xgo5S"
+                },
+                "logstore": "platform_test",
+                "source": "zkmq_testnet",
+                "cached": 0
+            }
+        }
+    },
+    "gomesh": {
+        "grpc": {
+            "laddr": ":2017"
+        },
+        "service": {
+            "zkmq.Etcd": {
+                "remote": [
+                    "127.0.0.1:2379"
+                ],
+                "dialTimeout": "10s"
+            },
+            "zkmq.Cluster": {
+                "node": {
+                    "name": "test_1",
+                    "laddr": "127.0.0.1:2017"
+                }
+            }
+        }
+    }
+}

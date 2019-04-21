@@ -1,0 +1,1 @@
+go build  -o .\.build\broker.exe .\cmd\broker && .\.build\broker  %*
