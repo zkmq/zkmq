@@ -17,14 +17,17 @@ import (
 type clusterImpl struct {
 	sync.Mutex
 	slf4go.Logger
-	Etcd     *clientv3.Client             `inject:"zkmq.Etcd"` //
-	nodeName string                       // cluster node name
-	laddr    string                       // cluster node external listen address
-	ttl      time.Duration                // etcd session ttl
-	session  *concurrency.Session         // etcd session
-	mutex    *concurrency.Mutex           // etcd mutex
-	hashring *consistent.Consistent       // consistent hash range
-	neighbor map[string]zkmq.BrokerClient // register neighbor nodes
+	Etcd       *clientv3.Client             `inject:"zkmq.Etcd"` //
+	nodeName   string                       // cluster node name
+	laddr      string                       // cluster node external listen address
+	ttl        time.Duration                // etcd session ttl
+	session    *concurrency.Session         // etcd session
+	mutex      *concurrency.Mutex           // etcd mutex
+	election   *concurrency.Election        // etcd election
+	hashring   *consistent.Consistent       // consistent hash range
+	neighbor   map[string]zkmq.BrokerClient // register neighbor nodes
+	isMaster   bool                         // master node flag
+	masterNode string                       // masterNode name
 }
 
 // New .

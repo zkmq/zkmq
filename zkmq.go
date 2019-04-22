@@ -13,4 +13,7 @@ var (
 
 // Cluster cluster low layer service
 type Cluster interface {
+	Master() (BrokerClient, bool)
+	IsMaster() bool
+	GetTopicBrokers(topic string)
 }

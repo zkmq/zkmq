@@ -30,6 +30,9 @@ func (cluster *clusterImpl) bootstrap() error {
 	}
 
 	go cluster.listenNodeEvt()
+	go cluster.handleElectionEvt()
+
+	go cluster.doElection()
 
 	return nil
 }
@@ -43,7 +46,9 @@ func (cluster *clusterImpl) newEtcdSession() error {
 
 	cluster.session = session
 
-	cluster.mutex = concurrency.NewMutex(cluster.session, "/boostrap/mutex/")
+	cluster.mutex = concurrency.NewMutex(cluster.session, "/boostrap/mutex")
+
+	cluster.election = concurrency.NewElection(cluster.session, "/master/election")
 
 	return nil
 }
