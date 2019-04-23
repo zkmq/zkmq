@@ -13,7 +13,13 @@ var (
 
 // Cluster cluster low layer service
 type Cluster interface {
-	Master() (BrokerClient, bool)
-	IsMaster() bool
-	GetTopicBrokers(topic string)
+	Name() string
+	TopicOffset(topic string) (uint64, error)
+	TopicStorage(topic string) ([]Storage, error)
+}
+
+// Storage .
+type Storage interface {
+	Name() string
+	Write(record *Record) error
 }

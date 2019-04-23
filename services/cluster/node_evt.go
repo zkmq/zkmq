@@ -3,10 +3,8 @@ package cluster
 import (
 	"context"
 
-	"github.com/zkmq/zkmq"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/mvcc/mvccpb"
-	"google.golang.org/grpc"
 )
 
 func (cluster *clusterImpl) listenNodeEvt() {
@@ -30,12 +28,12 @@ func (cluster *clusterImpl) handleNodeEvent(ev *clientv3.Event) {
 	switch ev.Type {
 	case mvccpb.PUT:
 
-		conn, err := grpc.Dial(string(ev.Kv.Value), grpc.WithInsecure())
+		storage, err := newRemoteStorage(string(ev.Kv.Key), string(ev.Kv.Value))
 
 		if err != nil {
 			cluster.ErrorF("dial to broker %s error: %s", string(ev.Kv.Value), err)
 		} else {
-			cluster.neighbor[string(ev.Kv.Key)] = zkmq.NewBrokerClient(conn)
+			cluster.neighbor[string(ev.Kv.Key)] = storage
 		}
 
 	case mvccpb.DELETE:

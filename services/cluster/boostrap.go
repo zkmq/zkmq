@@ -8,7 +8,6 @@ import (
 	"github.com/zkmq/zkmq"
 	"go.etcd.io/etcd/clientv3"
 	"go.etcd.io/etcd/clientv3/concurrency"
-	"google.golang.org/grpc"
 )
 
 func (cluster *clusterImpl) bootstrap() error {
@@ -112,24 +111,26 @@ func (cluster *clusterImpl) fetchClusterNodes() error {
 		return xerrors.Wrapf(err, "get zkmq nodes error")
 	}
 
-	nodes := make(map[string]zkmq.BrokerClient)
+	nodes := make(map[string]zkmq.Storage)
 
 	for _, kv := range getResp.Kvs {
 
 		cluster.DebugF("consistent hash node(%s,%s)", string(kv.Key), string(kv.Value))
 
 		if string(kv.Key) != "node/"+cluster.nodeName {
-			conn, err := grpc.Dial(string(kv.Value), grpc.WithInsecure())
+			storage, err := newRemoteStorage(string(kv.Key), string(kv.Value))
 
 			if err != nil {
 				return xerrors.Wrapf(err, "dial to broker %s error", string(kv.Value))
 			}
 
-			nodes[string(kv.Key)] = zkmq.NewBrokerClient(conn)
+			nodes[string(kv.Key)] = storage
 		}
 
 		cluster.hashring.Add(string(kv.Key))
 	}
+
+	nodes["node/"+cluster.nodeName] = cluster.Storage
 
 	cluster.neighbor = nodes
 

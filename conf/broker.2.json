@@ -17,7 +17,7 @@
     },
     "gomesh": {
         "grpc": {
-            "laddr": ":2018"
+            "laddr": ":3019"
         },
         "service": {
             "zkmq.Etcd": {
@@ -29,7 +29,7 @@
             "zkmq.Cluster": {
                 "node": {
                     "name": "test_2",
-                    "laddr": "127.0.0.1:2018"
+                    "laddr": "127.0.0.1:3019"
                 }
             }
         }

@@ -41,4 +41,6 @@ message OffsetChanged {
 message HandshakeRequest {}
 message HandshakeRespose { string id = 1; }
 
-service Broker {}
+service Broker { rpc BrokerWrite(Record) returns (PushResponse); }
+
+service Gateway { rpc Push(Record) returns (PushResponse); }

@@ -9,6 +9,7 @@ import (
 	"github.com/zkmq/zkmq/services/broker"
 	"github.com/zkmq/zkmq/services/cluster"
 	"github.com/zkmq/zkmq/services/etcd"
+	"github.com/zkmq/zkmq/services/storage"
 )
 
 func main() {
@@ -22,6 +23,10 @@ func main() {
 
 	gomesh.LocalService("zkmq.Cluster", func(config config.Config) (gomesh.Service, error) {
 		return cluster.New(config)
+	})
+
+	gomesh.LocalService("zkmq.Storage", func(config config.Config) (gomesh.Service, error) {
+		return storage.New(config)
 	})
 
 	app.Run("zkmq-broker")

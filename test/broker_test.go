@@ -1,17 +1,15 @@
 package test
 
 import (
+	"gx/ipfs/QmRvYNctevGUW52urgmoFZscT6buMKqhHezLUS64WepGWn/go-net/context"
 	"testing"
-
-	extend "github.com/dynamicgo/go-config-extend"
-
-	"github.com/zkmq/zkmq/services/metadata"
-
-	"github.com/dynamicgo/go-config/source/memory"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/zkmq/zkmq/client"
+	"github.com/zkmq/zkmq"
+	"google.golang.org/grpc"
+
+	extend "github.com/dynamicgo/go-config-extend"
 
 	config "github.com/dynamicgo/go-config"
 	"github.com/dynamicgo/go-config/source/file"
@@ -19,27 +17,34 @@ import (
 	_ "github.com/dynamicgo/gomesh/agent/basic"
 	"github.com/dynamicgo/slf4go"
 	"github.com/zkmq/zkmq/services/broker"
+	"github.com/zkmq/zkmq/services/cluster"
+	"github.com/zkmq/zkmq/services/etcd"
 	"github.com/zkmq/zkmq/services/storage"
 )
 
 var logger = slf4go.Get("test")
+var client zkmq.GatewayClient
 
 func init() {
 	gomesh.LocalService("zkmq.Broker", func(config config.Config) (gomesh.Service, error) {
 		return broker.New(config)
 	})
 
+	gomesh.LocalService("zkmq.Etcd", func(config config.Config) (gomesh.Service, error) {
+		return etcd.New(config)
+	})
+
+	gomesh.LocalService("zkmq.Cluster", func(config config.Config) (gomesh.Service, error) {
+		return cluster.New(config)
+	})
+
 	gomesh.LocalService("zkmq.Storage", func(config config.Config) (gomesh.Service, error) {
 		return storage.New(config)
 	})
 
-	gomesh.LocalService("zkmq.Metadata", func(config config.Config) (gomesh.Service, error) {
-		return metadata.New(config)
-	})
-
 	config := config.NewConfig()
 
-	err := config.Load(file.NewSource(file.WithPath("../conf/broker.json")))
+	err := config.Load(file.NewSource(file.WithPath("../conf/broker.1.json")))
 
 	if err != nil {
 		panic(err)
@@ -59,79 +64,23 @@ func init() {
 		panic(err)
 	}
 
-	createConsumerProducer()
-}
-
-var consumer client.Consumer
-var producer client.Producer
-
-func createConsumerProducer() {
-	conf := config.NewConfig()
-
-	err := conf.Load(memory.NewSource(memory.WithData([]byte(`
-	{
-		"topic":"test",
-		"producer":"hello",
-		"consumer":"wolrd",
-		"remote":"127.0.0.1:2019",
-		"default":{
-			"backend":"null"
-		}
-	}
-	`))))
+	conn, err := grpc.Dial("localhost:3018", grpc.WithInsecure())
 
 	if err != nil {
 		panic(err)
 	}
 
-	producer, err = client.NewProducer(conf)
-
-	if err != nil {
-		panic(err)
-	}
-
-	consumer, err = client.NewConsumer(conf)
-
-	if err != nil {
-		panic(err)
-	}
+	client = zkmq.NewGatewayClient(conn)
 }
 
-// func TestPushMessage(t *testing.T) {
+func TestPush(t *testing.T) {
+	resp, err := client.Push(context.Background(), &zkmq.Record{
+		Topic:   "test",
+		Key:     []byte("test"),
+		Content: []byte("test"),
+	})
 
-// 	record, err := producer.Record([]byte("test"), []byte("hello world"))
+	require.NoError(t, err)
 
-// 	require.NoError(t, err)
-
-// 	err = producer.Send(record)
-
-// 	require.NoError(t, err)
-
-// 	r := <-consumer.Recv()
-
-// 	err = consumer.Commit(r)
-
-// 	require.NoError(t, err)
-
-// 	time.Sleep(time.Second * 1)
-// }
-
-func BenchmarkProducer(t *testing.B) {
-	for i := 0; i < t.N; i++ {
-
-		record, err := producer.Record([]byte("test"), []byte("hello world"))
-
-		require.NoError(t, err)
-
-		err = producer.Send(record)
-
-		require.NoError(t, err)
-
-		r := <-consumer.Recv()
-
-		err = consumer.Commit(r)
-
-		require.NoError(t, err)
-	}
+	println(resp.Offset)
 }
-
