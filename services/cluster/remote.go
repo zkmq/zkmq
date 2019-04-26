@@ -10,13 +10,13 @@ import (
 	"github.com/zkmq/zkmq"
 )
 
-type remoteStorageImpl struct {
+type remoteBroker struct {
 	name   string
 	remote string
 	client zkmq.BrokerClient
 }
 
-func newRemoteStorage(name string, remote string) (zkmq.Storage, error) {
+func newRemoteBroker(name string, remote string) (*remoteBroker, error) {
 
 	conn, err := grpc.Dial(remote, grpc.WithInsecure())
 
@@ -26,17 +26,18 @@ func newRemoteStorage(name string, remote string) (zkmq.Storage, error) {
 
 	client := zkmq.NewBrokerClient(conn)
 
-	return &remoteStorageImpl{
+	return &remoteBroker{
 		client: client,
 		name:   name,
 		remote: remote,
 	}, nil
 }
 
-func (remote *remoteStorageImpl) Name() string {
+func (remote *remoteBroker) Name() string {
 	return remote.name
 }
-func (remote *remoteStorageImpl) Write(record *zkmq.Record) error {
+
+func (remote *remoteBroker) Write(record *zkmq.Record) error {
 	_, err := remote.client.BrokerWrite(context.Background(), record)
 
 	if err != nil {
@@ -44,4 +45,8 @@ func (remote *remoteStorageImpl) Write(record *zkmq.Record) error {
 	}
 
 	return err
+}
+
+func (remote *remoteBroker) TopicOffset(topic string) (uint64, error) {
+	return 0, nil
 }

@@ -118,7 +118,7 @@ func (cluster *clusterImpl) fetchClusterNodes() error {
 		cluster.DebugF("consistent hash node(%s,%s)", string(kv.Key), string(kv.Value))
 
 		if string(kv.Key) != "node/"+cluster.nodeName {
-			storage, err := newRemoteStorage(string(kv.Key), string(kv.Value))
+			storage, err := newRemoteBroker(string(kv.Key), string(kv.Value))
 
 			if err != nil {
 				return xerrors.Wrapf(err, "dial to broker %s error", string(kv.Value))

@@ -9,6 +9,7 @@ import (
 // errors
 var (
 	ErrExists = apierr.WithScope(-1, "node exists", "zkmq")
+	ErrMaster = apierr.WithScope(-2, "master status error", "zkmq")
 )
 
 // Cluster cluster low layer service

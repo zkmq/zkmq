@@ -28,7 +28,7 @@ func (cluster *clusterImpl) handleNodeEvent(ev *clientv3.Event) {
 	switch ev.Type {
 	case mvccpb.PUT:
 
-		storage, err := newRemoteStorage(string(ev.Kv.Key), string(ev.Kv.Value))
+		storage, err := newRemoteBroker(string(ev.Kv.Key), string(ev.Kv.Value))
 
 		if err != nil {
 			cluster.ErrorF("dial to broker %s error: %s", string(ev.Kv.Value), err)
