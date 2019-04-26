@@ -18,6 +18,8 @@ func (broker *brokerImpl) Push(ctx context.Context, record *zkmq.Record) (*zkmq.
 		return nil, xerrors.Wrapf(err, "get topic %s offset error", record.Topic)
 	}
 
+	broker.DebugF("offset %d", offset)
+
 	storages, err := broker.Cluster.TopicStorage(record.Topic)
 
 	if err != nil {

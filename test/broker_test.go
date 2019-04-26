@@ -75,7 +75,7 @@ func init() {
 
 func TestPush(t *testing.T) {
 	resp, err := client.Push(context.Background(), &zkmq.Record{
-		Topic:   "test",
+		Topic:   "test2",
 		Key:     []byte("test"),
 		Content: []byte("test"),
 	})

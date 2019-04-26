@@ -17,6 +17,8 @@ type Cluster interface {
 	Name() string
 	TopicOffset(topic string) (uint64, error)
 	TopicStorage(topic string) ([]Storage, error)
+	ConsumerOffset(topic string, consumer string) (uint64, error)
+	UpdateConsumerOffset(topic string, consumer string, offset uint64) error
 }
 
 // Storage .

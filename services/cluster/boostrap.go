@@ -29,9 +29,8 @@ func (cluster *clusterImpl) bootstrap() error {
 	}
 
 	go cluster.listenNodeEvt()
-	go cluster.handleElectionEvt()
-
-	go cluster.doElection()
+	// go cluster.handleElectionEvt()
+	// go cluster.doElection()
 
 	return nil
 }
